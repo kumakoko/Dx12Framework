@@ -55,15 +55,16 @@ public:
 
     /*********************************************************************************
      * Method:    Error
-     * FullName:  kgl::Error::Error
-     * Access:    public
-     * Returns:
+     * FullName:  Error::Error
+     * Access:    public 
+     * Returns:   
      * Qualifier:
+     * Parameter: const std::wstring & message
      * Parameter: HRESULT error
      * Parameter: const char * file
      * Parameter: uint32_t line
      *********************************************************************************/
-    Error(HRESULT error, const char* file, uint32_t line);
+    Error(const std::wstring& message, HRESULT error, const char* file, uint32_t line);
 
     /// <summary>
     /// Notifies this instance.
@@ -97,9 +98,9 @@ protected:
 
     enum EXCEPTION_TYPE
     {
-        EXCEPTION_MESSAGE,  ///< 返回错误消息
+        EXCEPTION_MESSAGE,  ///< 返回错误消息,出错的代码文件和行
         EXCEPTION_REGULAR,  ///< 返回错误消息,出错的代码文件和行
-        EXCEPTION_DX12    ///< 返回错误消息,出错的代码文件和行以及渲染器给的错误代码
+        EXCEPTION_DX12_COM  ///< 返回错误消息,出错的代码文件和行以及渲染器给的错误代码
     };
 
     ///错误类型
@@ -112,11 +113,12 @@ protected:
     std::wstring message_;
 
     /// 发生错误的代码文件名
-
     std::string file_;
 
     /// 发生错误的代码行
     uint32_t line_;
+
+    HRESULT hresult_;
 };
 
 

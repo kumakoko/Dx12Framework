@@ -18,11 +18,58 @@ class DX12_FRAMEWORK_DLL Dx12Application
 {
 public:
     const static int nFrameBackBufCount = 2;
+    /*********************************************************************************
+     * Method:    WindowsProcedure
+     * FullName:  Dx12Application::WindowsProcedure
+     * Access:    public static 
+     * Returns:   LRESULT WINAPI
+     * Qualifier:
+     * Parameter: HWND hWnd
+     * Parameter: UINT msg
+     * Parameter: WPARAM wParam
+     * Parameter: LPARAM lParam
+     *********************************************************************************/
     static LRESULT WINAPI WindowsProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+    /*********************************************************************************
+     * Method:    Dx12Application
+     * FullName:  Dx12Application::Dx12Application
+     * Access:    public 
+     * Returns:   
+     * Qualifier:
+     *********************************************************************************/
     Dx12Application();
+
+    /*********************************************************************************
+     * Method:    ~Dx12Application
+     * FullName:  Dx12Application::~Dx12Application
+     * Access:    virtual public 
+     * Returns:   
+     * Qualifier:
+     *********************************************************************************/
     virtual ~Dx12Application();
+
+    /*********************************************************************************
+     * Method:    MessageHandler
+     * FullName:  Dx12Application::MessageHandler
+     * Access:    public 
+     * Returns:   LRESULT WINAPI
+     * Qualifier:
+     * Parameter: HWND hWnd
+     * Parameter: UINT msg
+     * Parameter: WPARAM wParam
+     * Parameter: LPARAM lParam
+     *********************************************************************************/
     LRESULT WINAPI MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    void Go();
+
+    /*********************************************************************************
+     * Method:    Run
+     * FullName:  Dx12Application::Run
+     * Access:    public 
+     * Returns:   void
+     * Qualifier:
+     *********************************************************************************/
+    void Run();
 protected:
     /*********************************************************************************
      * Method:    ReleaseRenderer
@@ -122,6 +169,40 @@ protected:
      * Parameter: XMLElement * desc_element
      *********************************************************************************/
     virtual void CreatePipelineState(XMLElement* desc_element);
+
+    /*********************************************************************************
+     * Method:    CreateRenderStuff
+     * FullName:  Dx12Application::CreateRenderStuff
+     * Access:    virtual protected 
+     * Returns:   void
+     * Qualifier:
+     * Parameter: XMLElement render_stuff_elem
+     *********************************************************************************/
+    virtual void CreateRenderStuff(XMLElement* render_stuff_elem);
+
+    /*********************************************************************************
+     * Method:    CreateCommands
+     * FullName:  Dx12Application::CreateCommands
+     * Access:    virtual protected 
+     * Returns:   void
+     * Qualifier:
+     * Parameter: XMLElement * cmd_elem
+     *********************************************************************************/
+    virtual void CreateCommands(XMLElement* cmd_elem);
+
+    /*********************************************************************************
+     * Method:    CreateFence
+     * FullName:  Dx12Application::CreateFence
+     * Access:    virtual protected 
+     * Returns:   void
+     * Qualifier:
+     * Parameter: XMLElement * fence_elem
+     *********************************************************************************/
+    virtual void CreateFence(XMLElement* fence_elem);
+
+    virtual void PrepareWaitableTimer();
+
+    virtual void Render();
 protected:
     HWND m_hWnd;
     long m_WindowWidth;
@@ -130,6 +211,9 @@ protected:
     UINT nRTVDescriptorSize = 0U;
     UINT nFrameIndex = 0U;
     D3D_FEATURE_LEVEL d3d_feature_level_;
+    UINT n64FenceValue;
+    HANDLE hFenceEvent;
+    HANDLE phWait;
 #if defined(_DEBUG)
     ID3D12Debug* debugController = nullptr;
 #endif

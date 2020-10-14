@@ -158,7 +158,7 @@ public:
      * Parameter: const char * attr
      * Parameter: float default_value
      *********************************************************************************/
-    static float Attribute(const char* attr, float default_value);
+    static float AttributeValue(const char* attr, float default_value);
 
     /*********************************************************************************
      * Method:    Attribute
@@ -169,7 +169,7 @@ public:
      * Parameter: const char * attr
      * Parameter: double default_value
      *********************************************************************************/
-    static double Attribute(const char* attr, double default_value);
+    static double AttributeValue(const char* attr, double default_value);
 
     /*********************************************************************************
      * Method:    Attribute
@@ -180,7 +180,7 @@ public:
      * Parameter: const char * attr
      * Parameter: UINT default_value
      *********************************************************************************/
-    static UINT Attribute(const char* attr, UINT default_value);
+    static UINT AttributeValue(const char* attr, UINT default_value);
 
     /*********************************************************************************
      * Method:    Attribute
@@ -191,11 +191,11 @@ public:
      * Parameter: const char * attr
      * Parameter: INT default_value
      *********************************************************************************/
-    static INT Attribute(const char* attr, INT default_value);
+    static INT AttributeValue(const char* attr, INT default_value);
 
-    static BOOL AttributeBOOL(const char* attr, BOOL default_value);
+    static BOOL AttributeValueBOOL(const char* attr, BOOL default_value);
 
-    static bool Attribute(const char* attr, bool default_value);
+    static bool AttributeValue(const char* attr, bool default_value);
 };
 
 

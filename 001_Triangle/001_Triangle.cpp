@@ -7,7 +7,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	try
 	{
 		g_pDx12App = new TriangleApp();
-		g_pDx12App->Go();	
+		g_pDx12App->Run();	
 	}
 	catch (Error e)
 	{

@@ -225,7 +225,7 @@ DXGI_FORMAT XmlConfigHelper::GetDXGIFormat(const char* format_name)
     return iter->second;
 }
 
-float XmlConfigHelper::Attribute(const char* attr, float default_value)
+float XmlConfigHelper::AttributeValue(const char* attr, float default_value)
 {
     if (!attr)
         return default_value;
@@ -233,7 +233,7 @@ float XmlConfigHelper::Attribute(const char* attr, float default_value)
     return static_cast<float>(atof(attr));
 }
 
-double XmlConfigHelper::Attribute(const char* attr, double default_value)
+double XmlConfigHelper::AttributeValue(const char* attr, double default_value)
 {
     if (!attr)
         return default_value;
@@ -241,7 +241,7 @@ double XmlConfigHelper::Attribute(const char* attr, double default_value)
     return atof(attr);
 }
 
-UINT XmlConfigHelper::Attribute(const char* attr, UINT default_value)
+UINT XmlConfigHelper::AttributeValue(const char* attr, UINT default_value)
 {
     if (!attr)
         return default_value;
@@ -249,7 +249,7 @@ UINT XmlConfigHelper::Attribute(const char* attr, UINT default_value)
     return static_cast<UINT>(atoi(attr));
 }
 
-INT XmlConfigHelper::Attribute(const char* attr, INT default_value)
+INT XmlConfigHelper::AttributeValue(const char* attr, INT default_value)
 {
     if (!attr)
         return default_value;
@@ -257,7 +257,7 @@ INT XmlConfigHelper::Attribute(const char* attr, INT default_value)
     return static_cast<INT>(atoi(attr));
 }
 
-BOOL XmlConfigHelper::AttributeBOOL(const char* attr, BOOL default_value)
+BOOL XmlConfigHelper::AttributeValueBOOL(const char* attr, BOOL default_value)
 {
     if (!attr)
         return default_value;
@@ -265,7 +265,7 @@ BOOL XmlConfigHelper::AttributeBOOL(const char* attr, BOOL default_value)
     return _stricmp("TRUE", attr) == 0 ? TRUE : FALSE;
 }
 
-bool XmlConfigHelper::Attribute(const char* attr, bool default_value)
+bool XmlConfigHelper::AttributeValue(const char* attr, bool default_value)
 {
     if (!attr)
         return default_value;
@@ -364,12 +364,12 @@ void XmlConfigHelper::GetInputElementDesc(std::vector<D3D12_INPUT_ELEMENT_DESC>&
     while (elem)
     {
         desc.SemanticName = elem->Attribute("semantic_name");
-        desc.SemanticIndex = XmlConfigHelper::Attribute(elem->Attribute("semantic_index"), 0U);
+        desc.SemanticIndex = XmlConfigHelper::AttributeValue(elem->Attribute("semantic_index"), 0U);
         desc.Format = XmlConfigHelper::GetDXGIFormat(elem->Attribute("format"));
-        desc.InputSlot = XmlConfigHelper::Attribute(elem->Attribute("input_slot"), 0U);
-        desc.AlignedByteOffset = XmlConfigHelper::Attribute(elem->Attribute("aligned_byte_offset"), 0U);
+        desc.InputSlot = XmlConfigHelper::AttributeValue(elem->Attribute("input_slot"), 0U);
+        desc.AlignedByteOffset = XmlConfigHelper::AttributeValue(elem->Attribute("aligned_byte_offset"), 0U);
         desc.InputSlotClass = XmlConfigHelper::GetInputClassification(elem->Attribute("input_slot_class"));
-        desc.InstanceDataStepRate = XmlConfigHelper::Attribute(elem->Attribute("instance_data_step_rate"), 0U);
+        desc.InstanceDataStepRate = XmlConfigHelper::AttributeValue(elem->Attribute("instance_data_step_rate"), 0U);
         desc_array.emplace_back(desc);
         elem = elem->NextSiblingElement("D3D12_INPUT_ELEMENT_DESC");
     }
@@ -384,13 +384,13 @@ void XmlConfigHelper::InitGraphicsPipelineStateDesc(D3D12_GRAPHICS_PIPELINE_STAT
     //  psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader);
     desc->RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     desc->BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    desc->DepthStencilState.DepthEnable = XmlConfigHelper::AttributeBOOL(elem->Attribute("depth_stencil_state_depth_enable"),FALSE);//FALSE;
-    desc->DepthStencilState.StencilEnable = XmlConfigHelper::AttributeBOOL(elem->Attribute("depth_stencil_state_stencil_enable"),FALSE);//FALSE;
-    desc->SampleMask = XmlConfigHelper::Attribute(elem->Attribute("sample_mask"),UINT_MAX);//UINT_MAX;
+    desc->DepthStencilState.DepthEnable = XmlConfigHelper::AttributeValueBOOL(elem->Attribute("depth_stencil_state_depth_enable"),FALSE);//FALSE;
+    desc->DepthStencilState.StencilEnable = XmlConfigHelper::AttributeValueBOOL(elem->Attribute("depth_stencil_state_stencil_enable"),FALSE);//FALSE;
+    desc->SampleMask = XmlConfigHelper::AttributeValue(elem->Attribute("sample_mask"),UINT_MAX);//UINT_MAX;
     desc->PrimitiveTopologyType = XmlConfigHelper::GetPrimtiveTopologyType(elem->Attribute("primitive_topology_type"));//D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    desc->NumRenderTargets = XmlConfigHelper::Attribute(elem->Attribute("number_render_targets"),1); //1;
+    desc->NumRenderTargets = XmlConfigHelper::AttributeValue(elem->Attribute("number_render_targets"),1); //1;
     desc->RTVFormats[0] = XmlConfigHelper::GetDXGIFormat(elem->Attribute("rtv_0_formats"));//DXGI_FORMAT_R8G8B8A8_UNORM;
-    desc->SampleDesc.Count = XmlConfigHelper::Attribute(elem->Attribute("sample_desc_count"), 1); //1;
+    desc->SampleDesc.Count = XmlConfigHelper::AttributeValue(elem->Attribute("sample_desc_count"), 1); //1;
 }
 
 D3D12_PRIMITIVE_TOPOLOGY_TYPE XmlConfigHelper::GetPrimtiveTopologyType(const char* topology_type)

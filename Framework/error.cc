@@ -15,39 +15,47 @@ ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI
 #include "error.h"
 #include "string_convertor.h"
 
-Error::Error(const std::wstring& message) :
-    title_(L"Exception"), type_(EXCEPTION_MESSAGE), message_(message)
-{
-}
-
 Error::Error(const std::wstring& message, const char* file, uint32_t line) :
     title_(L"Regular Exception"), type_(EXCEPTION_REGULAR), message_(message),
     file_(file), line_(line)
 {
 }
 
-Error::Error(HRESULT error, const char* file, uint32_t line) :
-    title_(L"DirectX12 Exception"), type_(EXCEPTION_DX12), message_(L""),
-    file_(file), line_(line)
+Error::Error(const std::wstring& message, HRESULT error, const char* file, uint32_t line) :
+    title_(L"DirectX12 COM Exception"), type_(EXCEPTION_DX12_COM), message_(message),
+    file_(file), line_(line), hresult_(error)
 {
-
+    
 }
 
 std::wstring Error::AssembleOutput() const
 {
+    std::wstring file_name;
+    StringConvertor::ANSItoUTF16LE(file_.c_str(), file_name);
+
     switch (type_)
     {
+    case EXCEPTION_MESSAGE:
+        return message_;
     case EXCEPTION_REGULAR:
     {
-        std::wstring file_name;
-        StringConvertor::ANSItoUTF16LE(file_.c_str(), file_name);
         std::wstringstream wss;
         wss << message_ << L"\n" << file_name << L"\nLine " << line_;
         return wss.str();
     }
-    case EXCEPTION_MESSAGE:
-    case EXCEPTION_DX12:
-        return message_;
+    case EXCEPTION_DX12_COM:
+    {
+        LPVOID text_buffer = nullptr;
+        ::FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+            nullptr, hresult_, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&text_buffer, 0, nullptr);
+        std::wstringstream wss;
+        wss << message_ << L"\n\nFileName: " << file_name << L"\nLine: " << line_ << "L\n\n";
+        wss << "DirectX12 COM Error Code = " << hresult_ << std::hex<<L"\n";
+        wss << "Error code Description: ";
+        wss << reinterpret_cast<LPWSTR>(text_buffer);
+        LocalFree(text_buffer);
+        return wss.str();
+    }
     default:
         break;
     }
@@ -71,7 +79,7 @@ void Error::GRS_THROW_IF_FAILED(HRESULT hr, const char* file, int line)
 {
     if (FAILED(hr))
     {
-        throw Error(hr, file, line);
+        throw Error(L"调用Direct3D 12 API时发生COM异常",hr, file, line);
     }
 }
 

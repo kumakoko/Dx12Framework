@@ -38,7 +38,23 @@ Dx12Application::Dx12Application()
     m_WindowHeight = 768;
 }
 
-void Dx12Application::Go()
+void Dx12Application::PrepareWaitableTimer()
+{
+    //创建定时器对象，以便于创建高效的消息循环
+    phWait = CreateWaitableTimer(NULL, FALSE, NULL);
+    LARGE_INTEGER liDueTime = {};
+
+    liDueTime.QuadPart = -1i64;//1秒后开始计时
+
+    // 每40ms唤醒一次
+    SetWaitableTimer(phWait, &liDueTime, 1, NULL, NULL, 0);//40ms的周期
+}
+
+void Dx12Application::Render()
+{
+}
+
+void Dx12Application::Run()
 {
     WNDCLASSEX WindowClass = { sizeof(WNDCLASSEX),CS_CLASSDC,
                               Dx12Application::WindowsProcedure,
@@ -58,19 +74,81 @@ void Dx12Application::Go()
 
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLError ret = doc.LoadFile("default_renderer_setting.xml");
-    Error::ThrowTinyXMLException(ret,std::wstring(L"default_renderer_setting.xml"), __FILE__, __LINE__);
+    Error::ThrowTinyXMLException(ret, std::wstring(L"default_renderer_setting.xml"), __FILE__, __LINE__);
 
     InitRenderer(doc.FirstChildElement("renderer"));
+    PrepareWaitableTimer();
 
+    //开始消息循环，并在其中不断渲染
+    DWORD dwRet = 0;
+    BOOL bExit = FALSE;
+    MSG msg;
+
+    while (!bExit)
+    {
+        // https://www.cnblogs.com/shangdawei/p/4015772.html
+        /*MsgWaitForMultipleObjects阻塞时仍可以响应消息,类似WaitForMultipleObjects()，
+        但它会在“对象被激发”或“消息到达队列”时被唤醒而返回。
+        MsgWaitForMultipleObjects()多接收一个参数，允许指定哪些消息是观察对象。*/
+        dwRet = ::MsgWaitForMultipleObjects(
+            1,  // 表示pHandles所指的handles数组的元素个数，最大容量是MAXIMUM_WAIT_OBJECTS 
+            &phWait, // 指向一个由对象handles组成的数组，这些handles的类型不需要相同
+            FALSE, // 是否等待所有的handles被激发才返回
+                   // 都得到通知才返回，设置为FALSE，有一个内核对象得到通知就返回
+            INFINITE, // 超时时间
+            QS_ALLINPUT);// 欲观察的用户输入消息类型，现在是所有的用户输入都观察
+
+        switch (dwRet - WAIT_OBJECT_0)
+        {
+        case 0:
+        case WAIT_TIMEOUT:
+        {
+            Render();
+        }
+        break;
+        case 1:
+        {
+            //处理消息
+            while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                if (WM_QUIT != msg.message)
+                {
+                    ::TranslateMessage(&msg);
+                    ::DispatchMessage(&msg);
+                }
+                else
+                {
+                    bExit = TRUE;
+                }
+            }
+        }
+        break;
+        default:
+            break;
+        }
+
+    }
+
+    /*
     MSG Message;
     PeekMessage(&Message, 0, 0, 0, PM_REMOVE);
 
     while (Message.message != WM_QUIT)
     {
+        const float clearColor[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+        CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(pIRTVHeap->GetCPUDescriptorHandleForHeapStart()
+            , nFrameIndex
+            , nRTVDescriptorSize);
+        pICommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+        pICommandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+
+        Error::GRS_THROW_IF_FAILED(pISwapChain3->Present(1, 0),__FILE__,__LINE__);
+
         TranslateMessage(&Message);
         DispatchMessage(&Message);
         PeekMessage(&Message, 0, 0, 0, PM_REMOVE);
     }
+    */
 }
 
 Dx12Application::~Dx12Application()
@@ -164,7 +242,7 @@ void Dx12Application::CreateSwapchain(XMLElement* desc_element)
     swapChainDesc.Format = XmlConfigHelper::GetDXGIFormat(desc_element->Attribute("swapchain_format"));//DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.BufferUsage = XmlConfigHelper::GetDXGIUsage(desc_element->Attribute("buffer_usage"));// DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc.SwapEffect = XmlConfigHelper::GetDXGISwapEffect(desc_element->Attribute("swap_effect"));//DXGI_SWAP_EFFECT_FLIP_DISCARD;
-    swapChainDesc.SampleDesc.Count = XmlConfigHelper::Attribute("sample_desc_count", 1);//1;
+    swapChainDesc.SampleDesc.Count = XmlConfigHelper::AttributeValue(desc_element->Attribute("sample_desc_count"), 1);//1;
 
     Error::GRS_THROW_IF_FAILED(pIDXGIFactory5->CreateSwapChainForHwnd(
         pICommandQueue,     // Swap chain needs the queue so that it can force a flush on it.
@@ -189,8 +267,9 @@ void Dx12Application::CreateHeapDescriptor(XMLElement* desc_element)
     rtvHeapDesc.Flags = XmlConfigHelper::GetDescriptorHeapFlags(desc_element->Attribute("descriptor_heap_flags")); //D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 
     Error::GRS_THROW_IF_FAILED(pID3DDevice->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&pIRTVHeap)), __FILE__, __LINE__);
+
     //得到每个描述符元素的大小
-    nRTVDescriptorSize = pID3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    nRTVDescriptorSize = pID3DDevice->GetDescriptorHandleIncrementSize(rtvHeapDesc.Type);
 }
 
 //9、创建一个空的根描述符，也就是默认的根描述符
@@ -200,11 +279,13 @@ void Dx12Application::CreateDefaultRootSignature(XMLElement* desc_element)
     rootSignatureDesc.Init(0, nullptr, 0, nullptr,
         XmlConfigHelper::GetRootSignatureFlags(desc_element->Attribute("root_signature_flags"))//D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
     );
+
     ID3DBlob* signature = nullptr;
     ID3DBlob* error = nullptr;
     Error::GRS_THROW_IF_FAILED(D3D12SerializeRootSignature(&rootSignatureDesc,
         XmlConfigHelper::GetRootSignatureVersion(desc_element->Attribute("root_signature_version")),//D3D_ROOT_SIGNATURE_VERSION_1
         &signature, &error), __FILE__, __LINE__);
+
     Error::GRS_THROW_IF_FAILED(pID3DDevice->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&pIRootSignature)), __FILE__, __LINE__);
     DX12_FRAMEWORK_SAFE_RELEASE(signature);
     DX12_FRAMEWORK_SAFE_RELEASE(error);
@@ -227,17 +308,13 @@ void Dx12Application::CreatePipelineState(XMLElement* desc_element)
     ID3DBlob* vertexShader = nullptr;
     ID3DBlob* pixelShader = nullptr;
 
-    /*
 #if defined(_DEBUG)
-    // Enable better shader debugging with the graphics debugging tools.
-    UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+    UINT compileFlags = XmlConfigHelper::ParseShaderCompileFlags(desc_element->Attribute("debug_compile_flags"));
 #else
-    UINT compileFlags = 0;
-#endif
-    */
     UINT compileFlags = XmlConfigHelper::ParseShaderCompileFlags(desc_element->Attribute("compile_flags"));
-    TCHAR* pszShaderFileName = nullptr;
+#endif
 
+    TCHAR* pszShaderFileName = nullptr;
     const char* utf8_shader_file_name = desc_element->Attribute("shader_file_name");
     tstring shader_file_name;
 #if defined(UNICODE)
@@ -250,8 +327,6 @@ void Dx12Application::CreatePipelineState(XMLElement* desc_element)
     const char* vertex_shader_target_version = desc_element->Attribute("vertex_shader_target_version");
     const char* fragment_shader_entry_point = desc_element->Attribute("fragment_shader_entry_point");
     const char* fragment_shader_target_version = desc_element->Attribute("fragment_shader_target_version");
-
-    //TCHAR pszShaderFileName[] = _T("D:\\Projects_2018_08\\D3DPipelineTest\\D3D12Trigger\\Shader\\shaders.hlsl");
 
     Error::GRS_THROW_IF_FAILED(D3DCompileFromFile(shader_file_name.c_str(), nullptr, nullptr,
         vertex_shader_entry_point, vertex_shader_target_version, compileFlags, 0, &vertexShader, nullptr), __FILE__, __LINE__);
@@ -267,15 +342,42 @@ void Dx12Application::CreatePipelineState(XMLElement* desc_element)
 
     std::vector<D3D12_INPUT_ELEMENT_DESC> inputElementDescs;
     XmlConfigHelper::GetInputElementDesc(inputElementDescs, desc_element->FirstChildElement("all_input_element_desc"));
-
-    // Describe and create the graphics pipeline state object (PSO).
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
     psoDesc.InputLayout = { inputElementDescs.data(), inputElementDescs.size()/*_countof(inputElementDescs)*/ };
     psoDesc.pRootSignature = pIRootSignature;
     psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader);
     psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader);
-    XmlConfigHelper::InitGraphicsPipelineStateDesc(&psoDesc, desc_element->FirstChildElement("graphics_pipeline_state_desc"));
+    XmlConfigHelper::InitGraphicsPipelineStateDesc(&psoDesc, desc_element->FirstChildElement("D3D12_GRAPHICS_PIPELINE_STATE_DESC"));
     Error::GRS_THROW_IF_FAILED(pID3DDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pIPipelineState)), __FILE__, __LINE__);
+}
+
+void Dx12Application::CreateRenderStuff(XMLElement* render_stuff_elem)
+{
+
+}
+
+void Dx12Application::CreateCommands(XMLElement* cmd_alloc_elem)
+{
+    D3D12_COMMAND_LIST_TYPE cmd_list_type = XmlConfigHelper::GetCommandListType(cmd_alloc_elem->Attribute("command_list_type"));
+    Error::GRS_THROW_IF_FAILED(pID3DDevice->CreateCommandAllocator(
+        cmd_list_type, IID_PPV_ARGS(&pICommandAllocator)), __FILE__, __LINE__);
+    Error::GRS_THROW_IF_FAILED(pID3DDevice->CreateCommandList(
+        0, cmd_list_type, pICommandAllocator, pIPipelineState, IID_PPV_ARGS(&pICommandList)), __FILE__, __LINE__);
+}
+
+void Dx12Application::CreateFence(XMLElement* fence_elem)
+{
+    // 14、创建一个同步对象——围栏，用于等待渲染完成，因为现在Draw Call是异步的了
+    Error::GRS_THROW_IF_FAILED(pID3DDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&pIFence)), __FILE__, __LINE__);
+    n64FenceValue = 1;
+
+    // 15、创建一个Event同步对象，用于等待围栏事件通知
+    hFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+
+    if (hFenceEvent == nullptr)
+    {
+        Error::GRS_THROW_IF_FAILED(HRESULT_FROM_WIN32(GetLastError()), __FILE__, __LINE__);
+    }
 }
 
 void Dx12Application::InitRenderer(XMLElement* renderer_element)
@@ -300,13 +402,33 @@ void Dx12Application::InitRenderer(XMLElement* renderer_element)
     element = renderer_element->FirstChildElement("swap_chain");
     CreateSwapchain(element);//5、创建交换链 6、得到当前后缓冲区的序号，也就是下一个将要呈送显示的缓冲区的序号
 
+    element = renderer_element->FirstChildElement("heap_descriptor");
     CreateHeapDescriptor(element);//7、创建RTV(渲染目标视图)描述符堆(这里堆的含义应当理解为数组或者固定大小元素的固定大小显存池)
 
+    element = renderer_element->FirstChildElement("rtv_descriptor");
     CreateRenderTargetViewDescriptor(element);//8、创建RTV的描述符
-    
-    CreateRenderTargetViewDescriptor(element);//9、创建一个空的根描述符，也就是默认的根描述符
-    
+
+    element = renderer_element->FirstChildElement("default_root_signature");
+    CreateDefaultRootSignature(element);//9、创建一个空的根描述符，也就是默认的根描述符
+
+    element = renderer_element->FirstChildElement("pipeline_state");
     CreatePipelineState(element);// 10、编译Shader创建渲染管线状态对象
+
+    element = renderer_element->FirstChildElement("render_stuff"); // 创建各种渲染用的数据，比如顶点，纹理，等等
+    CreateRenderStuff(element);
+
+    element = renderer_element->FirstChildElement("commands"); // 12、创建命令列表 13 创建图形命令列表
+    CreateCommands(element);
+
+    element = renderer_element->FirstChildElement("fence"); // 14、创建一个同步对象——围栏，用于等待渲染完成  15、创建一个Event同步对象，用于等待围栏事件通知
+    CreateFence(element);
+
+
+    //16、创建定时器对象，以便于创建高效的消息循环
+    HANDLE phWait = CreateWaitableTimer(NULL, FALSE, NULL);
+    LARGE_INTEGER liDueTime = {};
+    liDueTime.QuadPart = -1i64;//1秒后开始计时
+    SetWaitableTimer(phWait, &liDueTime, 1, NULL, NULL, 0);//40ms的周期
 }
 
 void Dx12Application::ReleaseRenderer()
