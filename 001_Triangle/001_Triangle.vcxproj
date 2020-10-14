@@ -59,39 +59,43 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Dx12.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Dx12.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Dx12.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Dx12.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\win32</IntDir>
+    <IntDir>$(SolutionDir)Temp\$(ProjectName)$(Configuration)\win32\</IntDir>
     <OutDir>$(SolutionDir)Publish\</OutDir>
     <TargetName>$(ProjectName)_win32_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Publish\</OutDir>
-    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\x64</IntDir>
+    <IntDir>$(SolutionDir)Temp\$(ProjectName)$(Configuration)\x64\</IntDir>
     <TargetName>$(ProjectName)_x64_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Publish\</OutDir>
-    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\win32</IntDir>
+    <IntDir>$(SolutionDir)Temp\$(ProjectName)$(Configuration)\win32\</IntDir>
     <TargetName>$(ProjectName)_win32</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Publish\</OutDir>
-    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\x64</IntDir>
+    <IntDir>$(SolutionDir)Temp\$(ProjectName)$(Configuration)\x64\</IntDir>
     <TargetName>$(ProjectName)_x64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -104,7 +108,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile />
-      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -122,7 +126,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions);DX12_FRAMEWORK_X64</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile />
-      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,7 +145,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,7 +166,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions);DX12_FRAMEWORK_X64</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

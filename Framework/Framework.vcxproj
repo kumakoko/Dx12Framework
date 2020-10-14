@@ -59,39 +59,43 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Dx12.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Dx12.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Dx12.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Dx12.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Publish\</OutDir>
-    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\win32</IntDir>
+    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\win32\</IntDir>
     <TargetName>$(ProjectName)_win32_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Publish\</OutDir>
-    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\x64</IntDir>
+    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\x64\</IntDir>
     <TargetName>$(ProjectName)_x64_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Publish\</OutDir>
-    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\win32</IntDir>
+    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\win32\</IntDir>
     <TargetName>$(ProjectName)_win32</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Publish\</OutDir>
-    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\x64</IntDir>
+    <IntDir>$(SolutionDir)Temp\Framework\$(Configuration)\x64\</IntDir>
     <TargetName>$(ProjectName)_x64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -103,13 +107,13 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;FRAMEWORK_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR);$(TINYXML2_HEADER_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>../3rdLib/tinyxml2/lib;../3rdLib/iconv</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../3rdLib/tinyxml2/lib;../3rdLib/iconv;$(BOOST_LIB_DIR)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -121,13 +125,13 @@
       <PreprocessorDefinitions>_DEBUG;FRAMEWORK_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);DX12_FRAMEWORK_X64</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR);$(TINYXML2_HEADER_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>../3rdLib/tinyxml2/lib;../3rdLib/iconv</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../3rdLib/tinyxml2/lib;../3rdLib/iconv;$(BOOST_LIB_DIR)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,7 +145,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;FRAMEWORK_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR);$(TINYXML2_HEADER_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,7 +153,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>../3rdLib/tinyxml2/lib;../3rdLib/iconv</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../3rdLib/tinyxml2/lib;../3rdLib/iconv;$(BOOST_LIB_DIR)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,7 +167,7 @@
       <PreprocessorDefinitions>NDEBUG;FRAMEWORK_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);DX12_FRAMEWORK_X64</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR);$(TINYXML2_HEADER_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -171,7 +175,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>../3rdLib/tinyxml2/lib;../3rdLib/iconv</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../3rdLib/tinyxml2/lib;../3rdLib/iconv;$(BOOST_LIB_DIR)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -180,6 +184,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="string_convertor.h" />
+    <ClInclude Include="xml_config_helper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dx12_application.cc" />
@@ -191,6 +196,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="string_convertor.cc" />
+    <ClCompile Include="xml_config_helper.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

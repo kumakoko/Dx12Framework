@@ -16,61 +16,96 @@ ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI
 #include "string_convertor.h"
 
 Error::Error(const std::wstring& message) :
-	title_(L"Exception"), type_(EXCEPTION_MESSAGE), message_(message)
+    title_(L"Exception"), type_(EXCEPTION_MESSAGE), message_(message)
 {
 }
 
 Error::Error(const std::wstring& message, const char* file, uint32_t line) :
-	title_(L"Regular Exception"), type_(EXCEPTION_REGULAR), message_(message),
-	file_(file), line_(line)
+    title_(L"Regular Exception"), type_(EXCEPTION_REGULAR), message_(message),
+    file_(file), line_(line)
 {
 }
 
 Error::Error(HRESULT error, const char* file, uint32_t line) :
-	title_(L"DirectX12 Exception"), type_(EXCEPTION_DX12), message_(L""),
-	file_(file), line_(line)
+    title_(L"DirectX12 Exception"), type_(EXCEPTION_DX12), message_(L""),
+    file_(file), line_(line)
 {
 
 }
 
 std::wstring Error::AssembleOutput() const
 {
-	switch (type_)
-	{
-	case EXCEPTION_REGULAR:
-	{
-		std::wstring file_name;
-		StringConvertor::ANSItoUTF16LE(file_.c_str(), file_name);
-		std::wstringstream wss;
-		wss << message_ << L"\n" << file_name << L"\nLine " << line_;
-		return wss.str();
-	}
-	case EXCEPTION_MESSAGE:
-	case EXCEPTION_DX12:
-		return message_;
-	default:
-		break;
-	}
+    switch (type_)
+    {
+    case EXCEPTION_REGULAR:
+    {
+        std::wstring file_name;
+        StringConvertor::ANSItoUTF16LE(file_.c_str(), file_name);
+        std::wstringstream wss;
+        wss << message_ << L"\n" << file_name << L"\nLine " << line_;
+        return wss.str();
+    }
+    case EXCEPTION_MESSAGE:
+    case EXCEPTION_DX12:
+        return message_;
+    default:
+        break;
+    }
 
-	return std::wstring(L"");
+    return std::wstring(L"");
 }
 
 void Error::Prompt() const
 {
-	std::wstring output = this->AssembleOutput() + L"\nQuit Program?";
-	MessageBoxW(nullptr, title_.c_str(), output.c_str(), MB_OK);
+    std::wstring output = this->AssembleOutput() + L"\nQuit Program?";
+    MessageBoxW(nullptr, output.c_str(), title_.c_str(), MB_OK);
 }
 
 void Error::Notify() const
 {
-	::ShowCursor(true);
-	MessageBoxW(nullptr, title_.c_str(), AssembleOutput().c_str(), MB_OK);
+    ::ShowCursor(true);
+    MessageBoxW(nullptr, AssembleOutput().c_str(), title_.c_str(), MB_OK);
 }
 
 void Error::GRS_THROW_IF_FAILED(HRESULT hr, const char* file, int line)
 {
-	 if (FAILED(hr))
-	 {
-		 throw Error(hr, file, line); 
-	 }
+    if (FAILED(hr))
+    {
+        throw Error(hr, file, line);
+    }
+}
+
+void Error::ThrowTinyXMLException(XMLError error, const std::wstring& xml_file, const char* file, int line)
+{
+    if (XML_SUCCESS == error)
+        return;
+
+    std::wstring xml_error_type;
+
+    switch (error)
+    {
+    case XML_NO_ATTRIBUTE:xml_error_type = L"XML_NO_ATTRIBUTE"; break;
+    case XML_WRONG_ATTRIBUTE_TYPE:xml_error_type = L"XML_WRONG_ATTRIBUTE_TYPE"; break;
+    case XML_ERROR_FILE_NOT_FOUND:xml_error_type = L"XML_ERROR_FILE_NOT_FOUND"; break;
+    case XML_ERROR_FILE_COULD_NOT_BE_OPENED:xml_error_type = L"XML_ERROR_FILE_COULD_NOT_BE_OPENED"; break;
+    case XML_ERROR_FILE_READ_ERROR:xml_error_type = L"XML_ERROR_FILE_READ_ERROR"; break;
+    case XML_ERROR_PARSING_ELEMENT:xml_error_type = L"XML_ERROR_PARSING_ELEMENT"; break;
+    case XML_ERROR_PARSING_ATTRIBUTE:xml_error_type = L"XML_ERROR_PARSING_ATTRIBUTE"; break;
+    case XML_ERROR_PARSING_TEXT:xml_error_type = L"XML_ERROR_PARSING_TEXT"; break;
+    case XML_ERROR_PARSING_CDATA:xml_error_type = L"XML_ERROR_PARSING_CDATA"; break;
+    case XML_ERROR_PARSING_COMMENT:xml_error_type = L"XML_ERROR_PARSING_COMMENT"; break;
+    case XML_ERROR_PARSING_DECLARATION:xml_error_type = L"XML_ERROR_PARSING_DECLARATION"; break;
+    case XML_ERROR_PARSING_UNKNOWN:xml_error_type = L"XML_ERROR_PARSING_UNKNOWN"; break;
+    case XML_ERROR_EMPTY_DOCUMENT:xml_error_type = L"XML_ERROR_EMPTY_DOCUMENT"; break;
+    case XML_ERROR_MISMATCHED_ELEMENT:xml_error_type = L"XML_ERROR_MISMATCHED_ELEMENT"; break;
+    case XML_ERROR_PARSING:xml_error_type = L"XML_ERROR_PARSING"; break;
+    case XML_CAN_NOT_CONVERT_TEXT:xml_error_type = L"XML_CAN_NOT_CONVERT_TEXT"; break;
+    case XML_NO_TEXT_NODE:xml_error_type = L"XML_NO_TEXT_NODE"; break;
+    case XML_ELEMENT_DEPTH_EXCEEDED:xml_error_type = L"XML_ELEMENT_DEPTH_EXCEEDEDxml_error_type"; break;
+    }
+
+    std::wstringstream wss;
+    wss << L"Open " << xml_file << L" Error\n";
+    wss << L"error type: " << xml_error_type;
+    throw Error(wss.str(), file, line);
 }

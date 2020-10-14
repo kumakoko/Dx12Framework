@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <BOOST_HEADER_DIR>../3rdLib/boost_1_74_0</BOOST_HEADER_DIR>
+    <BOOST_LIB_DIR>../3rdLib/boost_1_74_0</BOOST_LIB_DIR>
+    <TINYXML2_HEADER_DIR>../3rdLib/tinyxml2</TINYXML2_HEADER_DIR>
+    <TINYXML2_LIB_DIR>../3rdLib/tinyxml2/lib</TINYXML2_LIB_DIR>
+    <ICONV_HEADER_DIR>../3rdLib/iconv</ICONV_HEADER_DIR>
+    <ICONV_LIB_DIR>../3rdLib/iconv</ICONV_LIB_DIR>
+    <D3DX12_HEADER_DIR>../3rdLib/d3dx12</D3DX12_HEADER_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="BOOST_HEADER_DIR">
+      <Value>$(BOOST_HEADER_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BOOST_LIB_DIR">
+      <Value>$(BOOST_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TINYXML2_HEADER_DIR">
+      <Value>$(TINYXML2_HEADER_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="TINYXML2_LIB_DIR">
+      <Value>$(TINYXML2_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ICONV_HEADER_DIR">
+      <Value>$(ICONV_HEADER_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ICONV_LIB_DIR">
+      <Value>$(ICONV_LIB_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="D3DX12_HEADER_DIR">
+      <Value>$(D3DX12_HEADER_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

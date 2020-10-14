@@ -30,6 +30,9 @@
     <ClInclude Include="string_convertor.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="xml_config_helper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cc">
@@ -42,6 +45,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="string_convertor.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="xml_config_helper.cc">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
