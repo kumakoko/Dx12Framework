@@ -21,14 +21,12 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="001_Triangle.h">
+    <ClInclude Include="triangle_app.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="001_Triangle.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
+    <ClInclude Include="triangle_app_renderer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="001_Triangle.rc">
@@ -42,5 +40,13 @@
     <Image Include="001_Triangle.ico">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="triangle_app.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="triangle_app_renderer.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

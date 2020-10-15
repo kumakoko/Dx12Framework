@@ -14,196 +14,76 @@ ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI
 #ifndef dx12_application_h__
 #define dx12_application_h__
 
+#include "dx12_renderer.h"
+
 class DX12_FRAMEWORK_DLL Dx12Application
 {
 public:
     const static int nFrameBackBufCount = 2;
+
     /*********************************************************************************
-     * Method:    WindowsProcedure
-     * FullName:  Dx12Application::WindowsProcedure
-     * Access:    public static 
-     * Returns:   LRESULT WINAPI
-     * Qualifier:
-     * Parameter: HWND hWnd
-     * Parameter: UINT msg
-     * Parameter: WPARAM wParam
-     * Parameter: LPARAM lParam
+     * @brief:
+     * @return: LRESULT WINAPI
+     * @param:  HWND hWnd
+     * @param:  UINT msg
+     * @param:  WPARAM wParam
+     * @param:  LPARAM lParam
      *********************************************************************************/
     static LRESULT WINAPI WindowsProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     /*********************************************************************************
-     * Method:    Dx12Application
-     * FullName:  Dx12Application::Dx12Application
-     * Access:    public 
-     * Returns:   
-     * Qualifier:
+     * @brief:
+     * @return: 
+     * @param:  const TCHAR * app_name
+     * @param:  long wnd_width
+     * @param:  long wnd_height
      *********************************************************************************/
-    Dx12Application();
+    Dx12Application(const TCHAR* app_name = _T("Direct3D 12 Application"), long wnd_width = 1024L, long wnd_height = 768L );
 
     /*********************************************************************************
-     * Method:    ~Dx12Application
-     * FullName:  Dx12Application::~Dx12Application
-     * Access:    virtual public 
-     * Returns:   
-     * Qualifier:
+     * @brief:
+     * @return:
      *********************************************************************************/
     virtual ~Dx12Application();
 
     /*********************************************************************************
-     * Method:    MessageHandler
-     * FullName:  Dx12Application::MessageHandler
-     * Access:    public 
-     * Returns:   LRESULT WINAPI
-     * Qualifier:
-     * Parameter: HWND hWnd
-     * Parameter: UINT msg
-     * Parameter: WPARAM wParam
-     * Parameter: LPARAM lParam
+     * @brief:
+     * @return: LRESULT WINAPI
+     * @param:  HWND hWnd
+     * @param:  UINT msg
+     * @param:  WPARAM wParam
+     * @param:  LPARAM lParam
      *********************************************************************************/
     LRESULT WINAPI MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+    virtual bool Init();
 
     /*********************************************************************************
      * Method:    Run
      * FullName:  Dx12Application::Run
-     * Access:    public 
+     * Access:    public
      * Returns:   void
      * Qualifier:
      *********************************************************************************/
-    void Run();
+    virtual void Run();
+
 protected:
     /*********************************************************************************
-     * Method:    ReleaseRenderer
-     * FullName:  Dx12Application::ReleaseRenderer
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
+     * @brief:
+     * @return: void
      *********************************************************************************/
-    virtual void ReleaseRenderer();
+    virtual void CreateAppWindow();
 
     /*********************************************************************************
-     * Method:    InitRenderer
-     * FullName:  Dx12Application::InitRenderer
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * desc_element
+     * @brief: 创建一个DX12 Renderer的实例，每一个不同的Demo应该继承Dx12Renderer类。实现
+               一个本demo适用的渲染器
+     * @return: void
      *********************************************************************************/
-    virtual void InitRenderer(XMLElement* desc_element);
+    virtual void CreateDX12Renderer() = 0;
 
-    /*********************************************************************************
-     * Method:    CreateDXGIFactory
-     * FullName:  Dx12Application::CreateDXGIFactory
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * desc_element
-     *********************************************************************************/
-    virtual void CreateDXGIFactory(XMLElement* desc_element);
-
-    /*********************************************************************************
-     * Method:    CreateD3DDevice
-     * FullName:  Dx12Application::EnumerateAdapterAndCreateDevice
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * desc_element
-     *********************************************************************************/
-    virtual void EnumerateAdapterAndCreateDevice(XMLElement* desc_element);
-
-    /*********************************************************************************
-     * Method:    CreateDefaultCommandQueue
-     * FullName:  Dx12Application::CreateDefaultCommandQueue
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * desc_element
-     *********************************************************************************/
-    virtual void CreateDefaultCommandQueue(XMLElement* desc_element);
-
-    /*********************************************************************************
-     * Method:    CreateSwapchain
-     * FullName:  Dx12Application::CreateSwapchain
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * desc_element
-     *********************************************************************************/
-    virtual void CreateSwapchain(XMLElement* desc_element);
-
-    /*********************************************************************************
-     * Method:    CreateHeapDescriptor
-     * FullName:  Dx12Application::CreateHeapDescriptor
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * desc_element
-     *********************************************************************************/
-    virtual void CreateHeapDescriptor(XMLElement* desc_element);
-
-    /*********************************************************************************
-     * Method:    CreateRenderTargetViewDescriptor
-     * FullName:  Dx12Application::CreateRenderTargetViewDescriptor
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * desc_element
-     *********************************************************************************/
-    virtual void CreateRenderTargetViewDescriptor(XMLElement* desc_element);
-
-    /*********************************************************************************
-     * Method:    CreateDefaultRootSignature
-     * FullName:  Dx12Application::CreateDefaultRootSignature
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * desc_element
-     *********************************************************************************/
-    virtual void CreateDefaultRootSignature(XMLElement* desc_element);
-
-    /*********************************************************************************
-     * Method:    CreatePipelineState
-     * FullName:  Dx12Application::CreatePipelineState
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * desc_element
-     *********************************************************************************/
-    virtual void CreatePipelineState(XMLElement* desc_element);
-
-    /*********************************************************************************
-     * Method:    CreateRenderStuff
-     * FullName:  Dx12Application::CreateRenderStuff
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement render_stuff_elem
-     *********************************************************************************/
-    virtual void CreateRenderStuff(XMLElement* render_stuff_elem);
-
-    /*********************************************************************************
-     * Method:    CreateCommands
-     * FullName:  Dx12Application::CreateCommands
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * cmd_elem
-     *********************************************************************************/
-    virtual void CreateCommands(XMLElement* cmd_elem);
-
-    /*********************************************************************************
-     * Method:    CreateFence
-     * FullName:  Dx12Application::CreateFence
-     * Access:    virtual protected 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: XMLElement * fence_elem
-     *********************************************************************************/
-    virtual void CreateFence(XMLElement* fence_elem);
-
-    virtual void PrepareWaitableTimer();
-
-    virtual void Render();
 protected:
+    tstring wnd_name_;
+    Dx12Renderer*  dx12_renderer_ = nullptr;
     HWND m_hWnd;
     long m_WindowWidth;
     long m_WindowHeight;

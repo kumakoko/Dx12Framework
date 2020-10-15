@@ -24,6 +24,11 @@ ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI
 #include <windows.h>
 #include <tchar.h>
 
+#include<wrl.h>
+
+using namespace Microsoft;
+using namespace Microsoft::WRL;
+
 // STL
 #include <string>
 #include <vector>

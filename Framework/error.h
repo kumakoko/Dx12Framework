@@ -77,18 +77,18 @@ public:
     virtual void Prompt() const;
 
     /*********************************************************************************
-     * Method:    GRS_THROW_IF_FAILED
-     * FullName:  Error::GRS_THROW_IF_FAILED
-     * Access:    public static 
-     * Returns:   void
-     * Qualifier:
-     * Parameter: HRESULT hr
-     * Parameter: const char * file
-     * Parameter: int line
+     * @brief:
+     * @return: void
+     * @param:  HRESULT hr
+     * @param:  const char * file
+     * @param:  int line
+     * @param:  const wchar_t * api_name
      *********************************************************************************/
-    static void GRS_THROW_IF_FAILED(HRESULT hr, const char* file, int line);
+    static void GRS_THROW_IF_FAILED(HRESULT hr, const char* file, int line, const wchar_t* api_name = nullptr);
 
     static void ThrowTinyXMLException(XMLError error, const std::wstring& xml_file, const char* file, int line);
+
+    static void ThrowErrorOfLastError(const char* file, int line);
 protected:
     /// <summary>
     /// 组装错误消息,返回错误消息字符串

@@ -40,7 +40,7 @@ std::wstring Error::AssembleOutput() const
     case EXCEPTION_REGULAR:
     {
         std::wstringstream wss;
-        wss << message_ << L"\n" << file_name << L"\nLine " << line_;
+        wss << message_ << L"\nFileName: " << file_name << L"\nLine: " << line_;
         return wss.str();
     }
     case EXCEPTION_DX12_COM:
@@ -63,6 +63,19 @@ std::wstring Error::AssembleOutput() const
     return std::wstring(L"");
 }
 
+void Error::ThrowErrorOfLastError(const char* file, int line)
+{
+    DWORD last_err_code = ::GetLastError();
+    LPVOID text_buffer = nullptr;
+    ::FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        nullptr, last_err_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&text_buffer, 0, nullptr);
+    std::wstringstream wss;
+    wss << L"Last windows error code: " << last_err_code << L"\n";
+    wss<< L"Last windows error message: " << reinterpret_cast<LPWSTR>(text_buffer) << L"\n";
+    LocalFree(text_buffer);
+    throw Error(wss.str(), file, line);
+}
+
 void Error::Prompt() const
 {
     std::wstring output = this->AssembleOutput() + L"\nQuit Program?";
@@ -75,11 +88,19 @@ void Error::Notify() const
     MessageBoxW(nullptr, AssembleOutput().c_str(), title_.c_str(), MB_OK);
 }
 
-void Error::GRS_THROW_IF_FAILED(HRESULT hr, const char* file, int line)
+void Error::GRS_THROW_IF_FAILED(HRESULT hr, const char* file, int line, const wchar_t* api_name)
 {
     if (FAILED(hr))
     {
-        throw Error(L"调用Direct3D 12 API时发生COM异常",hr, file, line);
+        if (api_name)
+        {
+            std::wstring msg(L"调用");
+            msg.append(api_name);
+            msg.append(L"api时发生COM异常\n");
+            throw Error(msg.c_str(), hr, file, line);
+        }
+        else
+            throw Error(L"发生COM异常",hr, file, line);
     }
 }
 

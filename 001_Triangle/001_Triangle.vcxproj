@@ -109,6 +109,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile />
       <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4275;4251;4373</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -127,6 +128,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile />
       <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4275;4251;4373</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -146,6 +148,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4275;4251;4373</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,6 +170,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions);DX12_FRAMEWORK_X64</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4275;4251;4373</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -177,12 +181,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="001_Triangle.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="001_Triangle.cpp" />
+    <ClInclude Include="triangle_app.h" />
+    <ClInclude Include="triangle_app_renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="001_Triangle.rc" />
@@ -190,6 +192,10 @@
   <ItemGroup>
     <Image Include="001_Triangle.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="triangle_app.cpp" />
+    <ClCompile Include="triangle_app_renderer.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
