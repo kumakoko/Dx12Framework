@@ -224,38 +224,46 @@ DXGI_FORMAT XmlConfigHelper::GetDXGIFormat(const char* format_name)
 
     return iter->second;
 }
-
-float XmlConfigHelper::AttributeValue(const char* attr, float default_value)
-{
-    if (!attr)
-        return default_value;
-
-    return static_cast<float>(atof(attr));
-}
-
-double XmlConfigHelper::AttributeValue(const char* attr, double default_value)
-{
-    if (!attr)
-        return default_value;
-
-    return atof(attr);
-}
-
-UINT XmlConfigHelper::AttributeValue(const char* attr, UINT default_value)
-{
-    if (!attr)
-        return default_value;
-
-    return static_cast<UINT>(atoi(attr));
-}
-
-INT XmlConfigHelper::AttributeValue(const char* attr, INT default_value)
-{
-    if (!attr)
-        return default_value;
-
-    return static_cast<INT>(atoi(attr));
-}
+//
+//float XmlConfigHelper::AttributeValue(const char* attr, float default_value)
+//{
+//    if (!attr)
+//        return default_value;
+//
+//    return static_cast<float>(atof(attr));
+//}
+//
+//double XmlConfigHelper::AttributeValue(const char* attr, double default_value)
+//{
+//    if (!attr)
+//        return default_value;
+//
+//    return atof(attr);
+//}
+//
+//UINT XmlConfigHelper::AttributeValue(const char* attr, UINT default_value)
+//{
+//    if (!attr)
+//        return default_value;
+//
+//    return static_cast<UINT>(atoi(attr));
+//}
+//
+//UINT16 XmlConfigHelper::AttributeValue(const char* attr, UINT16 default_value)
+//{
+//    if (!attr)
+//        return default_value;
+//
+//    return static_cast<UINT16>(atoi(attr));
+//}
+//
+//INT XmlConfigHelper::AttributeValue(const char* attr, INT default_value)
+//{
+//    if (!attr)
+//        return default_value;
+//
+//    return static_cast<INT>(atoi(attr));
+//}
 
 BOOL XmlConfigHelper::AttributeValueBOOL(const char* attr, BOOL default_value)
 {
@@ -265,6 +273,7 @@ BOOL XmlConfigHelper::AttributeValueBOOL(const char* attr, BOOL default_value)
     return _stricmp("TRUE", attr) == 0 ? TRUE : FALSE;
 }
 
+/*
 bool XmlConfigHelper::AttributeValue(const char* attr, bool default_value)
 {
     if (!attr)
@@ -272,6 +281,7 @@ bool XmlConfigHelper::AttributeValue(const char* attr, bool default_value)
 
     return _stricmp("TRUE", attr) == 0;
 }
+*/
 
 D3D12_DESCRIPTOR_HEAP_TYPE XmlConfigHelper::GetDescriptorHeapType(const char* heap_type)
 {
@@ -377,18 +387,18 @@ void XmlConfigHelper::GetInputElementDesc(std::vector<D3D12_INPUT_ELEMENT_DESC>&
 
 void XmlConfigHelper::InitGraphicsPipelineStateDesc(D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc, XMLElement* elem)
 {
-   // D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-    //  psoDesc.InputLayout = { inputElementDescs.data(), inputElementDescs.size()/*_countof(inputElementDescs)*/ };
-    //  psoDesc.pRootSignature = pIRootSignature;
-     // psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader);
-    //  psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader);
+    // D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+     //  psoDesc.InputLayout = { inputElementDescs.data(), inputElementDescs.size()/*_countof(inputElementDescs)*/ };
+     //  psoDesc.pRootSignature = pIRootSignature;
+      // psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader);
+     //  psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader);
     desc->RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     desc->BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    desc->DepthStencilState.DepthEnable = XmlConfigHelper::AttributeValueBOOL(elem->Attribute("depth_stencil_state_depth_enable"),FALSE);//FALSE;
-    desc->DepthStencilState.StencilEnable = XmlConfigHelper::AttributeValueBOOL(elem->Attribute("depth_stencil_state_stencil_enable"),FALSE);//FALSE;
-    desc->SampleMask = XmlConfigHelper::AttributeValue(elem->Attribute("sample_mask"),UINT_MAX);//UINT_MAX;
+    desc->DepthStencilState.DepthEnable = XmlConfigHelper::AttributeValueBOOL(elem->Attribute("depth_stencil_state_depth_enable"), FALSE);//FALSE;
+    desc->DepthStencilState.StencilEnable = XmlConfigHelper::AttributeValueBOOL(elem->Attribute("depth_stencil_state_stencil_enable"), FALSE);//FALSE;
+    desc->SampleMask = XmlConfigHelper::AttributeValue(elem->Attribute("sample_mask"), UINT_MAX);//UINT_MAX;
     desc->PrimitiveTopologyType = XmlConfigHelper::GetPrimtiveTopologyType(elem->Attribute("primitive_topology_type"));//D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    desc->NumRenderTargets = XmlConfigHelper::AttributeValue(elem->Attribute("number_render_targets"),1); //1;
+    desc->NumRenderTargets = XmlConfigHelper::AttributeValue(elem->Attribute("number_render_targets"), 1); //1;
     desc->RTVFormats[0] = XmlConfigHelper::GetDXGIFormat(elem->Attribute("rtv_0_formats"));//DXGI_FORMAT_R8G8B8A8_UNORM;
     desc->SampleDesc.Count = XmlConfigHelper::AttributeValue(elem->Attribute("sample_desc_count"), 1); //1;
 }
@@ -439,9 +449,9 @@ UINT XmlConfigHelper::ParseWindowAssociationFlag(const char* flags_compose)
 
     for (auto& flag_str : flag_str_array)
     {
-        if (_stricmp(flag_str.c_str(),"DXGI_MWA_NO_WINDOW_CHANGES") == 0 )
+        if (_stricmp(flag_str.c_str(), "DXGI_MWA_NO_WINDOW_CHANGES") == 0)
             flags |= DXGI_MWA_NO_WINDOW_CHANGES;
-        else if(_stricmp(flag_str.c_str(), "DXGI_MWA_NO_ALT_ENTER") == 0)
+        else if (_stricmp(flag_str.c_str(), "DXGI_MWA_NO_ALT_ENTER") == 0)
             flags |= DXGI_MWA_NO_ALT_ENTER;
         else if (_stricmp(flag_str.c_str(), "DXGI_MWA_NO_PRINT_SCREEN") == 0)
             flags |= DXGI_MWA_NO_PRINT_SCREEN;
@@ -504,4 +514,132 @@ UINT XmlConfigHelper::ParseShaderCompileFlags(const char* compile_flags_compose)
     }
 
     return flags;
+}
+
+D3D12_COMMAND_QUEUE_FLAGS XmlConfigHelper::GetCommandQueueFlag(const char* command_queue_flags)
+{
+    if (!command_queue_flags)
+        return D3D12_COMMAND_QUEUE_FLAG_NONE;
+    else
+    {
+        if (_stricmp("D3D12_COMMAND_QUEUE_FLAG_NONE", command_queue_flags) == 0)
+            return D3D12_COMMAND_QUEUE_FLAG_NONE;
+        else if (_stricmp("D3D12_COMMAND_QUEUE_FLAG_DISABLE_GPU_TIMEOUT", command_queue_flags) == 0)
+            return D3D12_COMMAND_QUEUE_FLAG_DISABLE_GPU_TIMEOUT;
+        else
+            return D3D12_COMMAND_QUEUE_FLAG_NONE;
+    }
+}
+
+D3D12_COMMAND_QUEUE_PRIORITY XmlConfigHelper::GetCommandQueuePriority(const char* command_queue_priority)
+{
+    if (!command_queue_priority)
+        return D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+    else
+    {
+        if (_stricmp("D3D12_COMMAND_QUEUE_PRIORITY_NORMAL", command_queue_priority) == 0)
+            return D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+        else if (_stricmp("D3D12_COMMAND_QUEUE_PRIORITY_HIGH", command_queue_priority) == 0)
+            return D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
+        else if (_stricmp("D3D12_COMMAND_QUEUE_PRIORITY_GLOBAL_REALTIME", command_queue_priority) == 0)
+            return D3D12_COMMAND_QUEUE_PRIORITY_GLOBAL_REALTIME;
+        else
+            return D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+    }
+}
+
+D3D12_RTV_DIMENSION XmlConfigHelper::GetRenderTargetDimensionType(const char* rtv_dimension_type)
+{
+    if (!rtv_dimension_type)
+        return D3D12_RTV_DIMENSION_UNKNOWN;
+    else
+    {
+        if (_stricmp("D3D12_RTV_DIMENSION_UNKNOWN", rtv_dimension_type) == 0)
+            return D3D12_RTV_DIMENSION_UNKNOWN;
+        else if (_stricmp("D3D12_RTV_DIMENSION_BUFFER", rtv_dimension_type) == 0)
+            return D3D12_RTV_DIMENSION_BUFFER;
+        else if (_stricmp("D3D12_RTV_DIMENSION_TEXTURE1D", rtv_dimension_type) == 0)
+            return D3D12_RTV_DIMENSION_TEXTURE1D;
+        else if (_stricmp("D3D12_RTV_DIMENSION_TEXTURE1DARRAY", rtv_dimension_type) == 0)
+            return D3D12_RTV_DIMENSION_TEXTURE1DARRAY;
+        else if (_stricmp("D3D12_RTV_DIMENSION_TEXTURE2D", rtv_dimension_type) == 0)
+            return D3D12_RTV_DIMENSION_TEXTURE2D;
+        else if (_stricmp("D3D12_RTV_DIMENSION_TEXTURE2DARRAY", rtv_dimension_type) == 0)
+            return D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+        else if (_stricmp("D3D12_RTV_DIMENSION_TEXTURE2DMS", rtv_dimension_type) == 0)
+            return D3D12_RTV_DIMENSION_TEXTURE2DMS;
+        else if (_stricmp("D3D12_RTV_DIMENSION_TEXTURE2DMSARRAY", rtv_dimension_type) == 0)
+            return D3D12_RTV_DIMENSION_TEXTURE2DMSARRAY;
+        else if (_stricmp("D3D12_RTV_DIMENSION_TEXTURE3D", rtv_dimension_type) == 0)
+            return D3D12_RTV_DIMENSION_TEXTURE3D;
+        else
+            return D3D12_RTV_DIMENSION_UNKNOWN;
+    }
+}
+
+D3D12_RESOURCE_DIMENSION XmlConfigHelper::GetResourceDimensionType(const char* res_dimension_type)
+{
+    if (!res_dimension_type)
+        return D3D12_RESOURCE_DIMENSION_UNKNOWN;
+    else
+    {
+        if (_stricmp("D3D12_RESOURCE_DIMENSION_UNKNOWN", res_dimension_type) == 0)
+            return D3D12_RESOURCE_DIMENSION_UNKNOWN;
+        else if (_stricmp("D3D12_RESOURCE_DIMENSION_BUFFER", res_dimension_type) == 0)
+            return D3D12_RESOURCE_DIMENSION_BUFFER;
+        else if (_stricmp("D3D12_RESOURCE_DIMENSION_TEXTURE1D", res_dimension_type) == 0)
+            return D3D12_RESOURCE_DIMENSION_TEXTURE1D;
+        else if (_stricmp("D3D12_RESOURCE_DIMENSION_TEXTURE2D", res_dimension_type) == 0)
+            return D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        else if (_stricmp("D3D12_RESOURCE_DIMENSION_TEXTURE3D", res_dimension_type) == 0)
+            return D3D12_RESOURCE_DIMENSION_TEXTURE3D;
+        else
+            return D3D12_RESOURCE_DIMENSION_UNKNOWN;
+    }
+}
+
+D3D12_RESOURCE_FLAGS XmlConfigHelper::GetResourceFlagsType(const char* res_flag_type)
+{
+    if (!res_flag_type)
+        return D3D12_RESOURCE_FLAG_NONE;
+    else
+    {
+        if (_stricmp("D3D12_RESOURCE_FLAG_NONE", res_flag_type) == 0)
+            return D3D12_RESOURCE_FLAG_NONE;
+        else if (_stricmp("D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET", res_flag_type) == 0)
+            return D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+        else if (_stricmp("D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL", res_flag_type) == 0)
+            return D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+        else if (_stricmp("D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS", res_flag_type) == 0)
+            return D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+        else if (_stricmp("D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE", res_flag_type) == 0)
+            return D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
+        else if (_stricmp("D3D12_RESOURCE_FLAG_ALLOW_CROSS_ADAPTER", res_flag_type) == 0)
+            return D3D12_RESOURCE_FLAG_ALLOW_CROSS_ADAPTER;
+        else if (_stricmp("D3D12_RESOURCE_FLAG_ALLOW_SIMULTANEOUS_ACCESS", res_flag_type) == 0)
+            return D3D12_RESOURCE_FLAG_ALLOW_SIMULTANEOUS_ACCESS;
+        else if (_stricmp("D3D12_RESOURCE_FLAG_VIDEO_DECODE_REFERENCE_ONLY", res_flag_type) == 0)
+            return D3D12_RESOURCE_FLAG_VIDEO_DECODE_REFERENCE_ONLY;
+        else
+            return D3D12_RESOURCE_FLAG_NONE;
+    }
+}
+
+D3D12_TEXTURE_LAYOUT XmlConfigHelper::GetTextureLayoutType(const char* texture_layout_type)
+{
+    if (!texture_layout_type)
+        return D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    else
+    {
+        if (_stricmp("D3D12_TEXTURE_LAYOUT_UNKNOWN", texture_layout_type) == 0)
+            return D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        else if (_stricmp("D3D12_TEXTURE_LAYOUT_ROW_MAJOR", texture_layout_type) == 0)
+            return D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        else if (_stricmp("D3D12_TEXTURE_LAYOUT_64KB_UNDEFINED_SWIZZLE", texture_layout_type) == 0)
+            return D3D12_TEXTURE_LAYOUT_64KB_UNDEFINED_SWIZZLE;
+        else if (_stricmp("D3D12_TEXTURE_LAYOUT_64KB_STANDARD_SWIZZLE", texture_layout_type) == 0)
+            return D3D12_TEXTURE_LAYOUT_64KB_STANDARD_SWIZZLE;
+        else
+            return D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    }
 }

@@ -39,14 +39,13 @@ Dx12Application::Dx12Application(const TCHAR* app_name, long wnd_width, long wnd
     m_WindowHeight = wnd_height;
 }
 
-bool Dx12Application::Init()
+void Dx12Application::Init()
 {
     HRESULT result = CoInitializeEx(0, COINIT_MULTITHREADED);
     Error::GRS_THROW_IF_FAILED(result, __FILE__, __LINE__, L"CoInitializeEx");
     CreateAppWindow();
     CreateDX12Renderer();
     //  dx12_renderer_->ExecuteCommand();
-    return true;
 }
 
 void Dx12Application::Run()
@@ -78,38 +77,26 @@ void Dx12Application::Run()
 }
 
 void Dx12Application::CreateAppWindow()
-{/*
-    WNDCLASSEX windowClass;
-
-    
-    HINSTANCE hInst = GetModuleHandle(nullptr);
-
-    windowClass.cbSize = sizeof(WNDCLASSEX);
-    windowClass.lpfnWndProc = (WNDPROC)WindowsProcedure;//
-    windowClass.lpszClassName = _T("DirectD12APP"); //
-    windowClass.hInstance = GetModuleHandle(0);//
-    RegisterClassEx(&windowClass);//
-    */
-
+{
     WNDCLASSEX windowClass = { sizeof(WNDCLASSEX),
                           CS_CLASSDC,
                           WindowsProcedure,
                           0,
                           0,
-                          GetModuleHandle(NULL),
-                          NULL,
-                          NULL,
-                          NULL,
-                          NULL,
+                          GetModuleHandle(nullptr),
+                          nullptr,
+                          nullptr,
+                          nullptr,
+                          nullptr,
                           _T("DirectD12APP"),
-                          NULL };
+                          nullptr };
 
     RegisterClassEx(&windowClass);
 
     RECT wrc = { 0,0, m_WindowWidth, m_WindowHeight };//
     AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);//
 
-    m_hWnd = CreateWindow(_T("DirectD12APP")/*windowClass.lpszClassName*/,//
+    m_hWnd = CreateWindow(_T("DirectD12APP"),
         _T("DirectD12APP"),//
         WS_OVERLAPPEDWINDOW,//
         CW_USEDEFAULT,//
@@ -135,13 +122,13 @@ void Dx12Application::CreateAppWindow()
 //void Dx12Application::PrepareWaitableTimer()
 //{
 //    //创建定时器对象，以便于创建高效的消息循环
-//    phWait = CreateWaitableTimer(NULL, FALSE, NULL);
+//    phWait = CreateWaitableTimer(nullptr, FALSE, nullptr);
 //    LARGE_INTEGER liDueTime = {};
 //
 //    liDueTime.QuadPart = -1i64;//1秒后开始计时
 //
 //    // 每40ms唤醒一次
-//    SetWaitableTimer(phWait, &liDueTime, 1, NULL, NULL, 0);//40ms的周期
+//    SetWaitableTimer(phWait, &liDueTime, 1, nullptr, nullptr, 0);//40ms的周期
 //}
 //
 //void Dx12Application::Render()
@@ -213,7 +200,7 @@ void Dx12Application::CreateAppWindow()
 //        case 1:
 //        {
 //            //处理消息
-//            while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+//            while (::PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 //            {
 //                if (WM_QUIT != msg.message)
 //                {
@@ -530,10 +517,10 @@ Dx12Application::~Dx12Application()
 //
 //
 //    //16、创建定时器对象，以便于创建高效的消息循环
-//    HANDLE phWait = CreateWaitableTimer(NULL, FALSE, NULL);
+//    HANDLE phWait = CreateWaitableTimer(nullptr, FALSE, nullptr);
 //    LARGE_INTEGER liDueTime = {};
 //    liDueTime.QuadPart = -1i64;//1秒后开始计时
-//    SetWaitableTimer(phWait, &liDueTime, 1, NULL, NULL, 0);//40ms的周期
+//    SetWaitableTimer(phWait, &liDueTime, 1, nullptr, nullptr, 0);//40ms的周期
 //}
 //
 //void Dx12Application::ReleaseRenderer()

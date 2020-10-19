@@ -27,53 +27,58 @@ protected:
 
     ComPtr<ID3D12Fence> _fence = nullptr;
     UINT64 _fenceVal = 0;
+
+    D3D_FEATURE_LEVEL d3d_feature_level_ = D3D_FEATURE_LEVEL_12_1;
 public:
     /*********************************************************************************
      * @brief:  生成深度/模板缓冲区
      * @return: void
-     * @param:  const MLElement * elem
+     * @param:  const MLElement * elem 创建接口时包含有各种配置参数的XML Element实例指针
      *********************************************************************************/
     virtual void CreateDepthStencilView(const XMLElement* elem);
 
     /*********************************************************************************
-     * @brief:
+     * @brief:  创建交换链的相关信息
      * @return: void
-     * @param:  const XMLElement * elem
+     * @param:  const XMLElement * elem 创建接口时包含有各种配置参数的XML Element实例指针
      *********************************************************************************/
     virtual void CreateSwapChain(const XMLElement* elem);
 
     /*********************************************************************************
      * @brief:
      * @return: void
-     * @param:  const XMLElement * elem
+     * @param:  const XMLElement * elem 创建接口时包含有各种配置参数的XML Element实例指针
      *********************************************************************************/
     virtual void InitializeDXGIDevice(const XMLElement* elem);
 
     /*********************************************************************************
-     * @brief:
+     * @brief:  创建和GPU绘制/计算命令相关的各种接口，包括：
+                命令分配器接口ID3D12CommandAllocator
+                命令列表接口ID3D12GraphicsCommandLis
+                命令队列接口ID3D12CommandQueue
      * @return: void
-     * @param:  const XMLElement * elem
+     * @param:  const XMLElement * elem 创建接口时包含有各种配置参数的XML Element实例指针
      *********************************************************************************/
-    virtual void InitializeCommand(const XMLElement* elem);
+    void InitializeCommand(const XMLElement* elem);
 
     /*********************************************************************************
      * @brief:
      * @return: void
-     * @param:  const XMLElement * elem
+     * @param:  const XMLElement * elem 创建接口时包含有各种配置参数的XML Element实例指针
      *********************************************************************************/
     virtual void CreateSceneView(const XMLElement* elem);
 
     /*********************************************************************************
      * @brief:
      * @return: void
-     * @param:  const XMLElement * elem
+     * @param:  const XMLElement * elem 创建接口时包含有各种配置参数的XML Element实例指针
      *********************************************************************************/
     virtual void CreateFinalRenderTargets(const XMLElement* elem);
 
     /*********************************************************************************
      * @brief:
      * @return: void
-     * @param:  const XMLElement * elem
+     * @param:  const XMLElement * elem 创建接口时包含有各种配置参数的XML Element实例指针
      *********************************************************************************/
     virtual void CreateFence(const XMLElement* elem);
 public:

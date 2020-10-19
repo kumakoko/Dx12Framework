@@ -56,20 +56,24 @@ public:
      *********************************************************************************/
     LRESULT WINAPI MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-    virtual bool Init();
+    /*********************************************************************************
+     * @brief: 应用程序进程执行的主入口函数，基类的Init函数调用了：
+                1 CoInitializeEx函数，初始化了COM库，Direct3D 12初始化时要用到COM
+                2 Dx12Application::CreateAppWindow()函数，用以创建应用程序窗口
+                3 Dx12Application::CreateDX12Renderer()函数，创建DX12渲染器
+     * @return: void
+     *********************************************************************************/
+    virtual void Init();
 
     /*********************************************************************************
-     * Method:    Run
-     * FullName:  Dx12Application::Run
-     * Access:    public
-     * Returns:   void
-     * Qualifier:
+     * @brief:
+     * @return: void
      *********************************************************************************/
     virtual void Run();
 
 protected:
     /*********************************************************************************
-     * @brief:
+     * @brief:  创建应用程序窗口
      * @return: void
      *********************************************************************************/
     virtual void CreateAppWindow();

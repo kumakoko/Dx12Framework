@@ -1,25 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <renderer>
-    <dxgi_factory
-        window_association="DXGI_MWA_NO_ALT_ENTER" />
-
-    <adapter_and_device
+    <dxgi_factory_adapter_device
+        window_association="DXGI_MWA_NO_ALT_ENTER"
         feature_level_sub_ver="1"/>
-
-    <command_queue 
-        command_list_type="D3D12_COMMAND_LIST_TYPE_DIRECT"/>
 
     <swap_chain 
         swapchain_format="DXGI_FORMAT_R8G8B8A8_UNORM"
         buffer_usage="DXGI_USAGE_RENDER_TARGET_OUTPUT"
         swap_effect="DXGI_SWAP_EFFECT_FLIP_DISCARD"
-        sample_desc_count="1"/>
+        sample_desc_count="1"
+        sample_desc_quality="0"/>
 
-    <heap_descriptor 
-        descriptor_heap_type="D3D12_DESCRIPTOR_HEAP_TYPE_RTV"
-        descriptor_heap_flags="D3D12_DESCRIPTOR_HEAP_FLAG_NONE"/>
+    <!--创建和GPU绘制/计算命令相关的各种接口所需的参数，这些接口包括有：
+        命令分配器接口ID3D12CommandAllocator
+        命令列表接口ID3D12GraphicsCommandLis
+        命令队列接口ID3D12CommandQueue-->
+    <commands command_list_type="D3D12_COMMAND_LIST_TYPE_DIRECT">
+        <D3D12_COMMAND_QUEUE_DESC
+        flags="D3D12_COMMAND_QUEUE_FLAG_NONE"
+        node_mask="0"
+        priority="D3D12_COMMAND_QUEUE_PRIORITY_NORMAL"/>
+    </commands>
 
-    <rtv_descriptor />
+    <final_render_target>
+        <D3D12_DESCRIPTOR_HEAP_DESC 
+            type="D3D12_DESCRIPTOR_HEAP_TYPE_RTV"
+            flags="D3D12_DESCRIPTOR_HEAP_FLAG_NONE"
+            node_mask="0"
+            num_descriptors="2"/>
+
+        <D3D12_RENDER_TARGET_VIEW_DESC
+            format="DXGI_FORMAT_R8G8B8A8_UNORM_SRGB"
+            view_dimension="D3D12_RTV_DIMENSION_TEXTURE2D"/>
+    </final_render_target>
+
+    <!--缺省的深度模板缓冲区-->
+    <default_depth_stencil_view>
+        <D3D12_RESOURCE_DESC
+            dimension="D3D12_RESOURCE_DIMENSION_TEXTURE2D"
+            depth_or_array_size="1"
+            format="DXGI_FORMAT_D32_FLOAT"
+            sample_desc_count="1"
+            sample_desc_quality="0"
+            flags="D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL"
+            layout="D3D12_TEXTURE_LAYOUT_UNKNOWN"
+            mip_levels="1"
+            alignment="0"/>
+    </default_depth_stencil_view>
 
     <default_root_signature
         root_signature_flags="D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT"
@@ -61,5 +88,5 @@
             sample_desc_count="1"/>
     </pipeline_state>
 
-    <commands command_list_type="D3D12_COMMAND_LIST_TYPE_DIRECT"/>
+
 </renderer>
