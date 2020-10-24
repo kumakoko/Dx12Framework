@@ -36,6 +36,24 @@
     <ClInclude Include="dx12_renderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="d3d12_resource_desc_ex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12_heap_properties_ex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12_clear_value_ex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12_depth_stencil_view_desc_ex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12_descriptor_heap_desc_ex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12_render_target_view_desc_ex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cc">
@@ -54,6 +72,24 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="dx12_renderer.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d12_resource_desc_ex.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d12_heap_properties_ex.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d12_clear_value_ex.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d12_depth_stencil_view_desc_ex.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d12_descriptor_heap_desc_ex.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d12_render_target_view_desc_ex.cc">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

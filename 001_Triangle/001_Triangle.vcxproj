@@ -110,6 +110,7 @@
       <PrecompiledHeaderFile />
       <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4275;4251;4373</DisableSpecificWarnings>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -129,6 +130,7 @@
       <PrecompiledHeaderFile />
       <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4275;4251;4373</DisableSpecificWarnings>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,6 +151,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4275;4251;4373</DisableSpecificWarnings>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -171,6 +174,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../3rdLib/tinyxml2;../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4275;4251;4373</DisableSpecificWarnings>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

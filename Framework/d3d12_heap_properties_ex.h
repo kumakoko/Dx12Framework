@@ -11,112 +11,57 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 **************************************************************************************************************************/
-/*!
-* \file kgl_error.h
-* \date 2017/12/31 13:38
-*
-* \author www.xionggf.com
-* Contact: sun_of_lover@sina.com
-*
-* \brief
-*
-* TODO: 继承自xgf::Error的异常类,由各调用模块抛出
-*
-* \note
-*/
-#ifndef kgl_error_h__
-#define kgl_error_h__
+#ifndef d3d12_heap_properties_ex_h__
+#define d3d12_heap_properties_ex_h__
 
-
-class DX12_FRAMEWORK_DLL Error : public std::exception
+class DX12_FRAMEWORK_DLL D3D12HeapPropertiesEx : public CD3DX12_HEAP_PROPERTIES
 {
 public:
     /*********************************************************************************
      * @brief:
      * @return: 
-     * @param:  const std::wstring & message
      *********************************************************************************/
-    Error(const std::wstring& message);
-
-    /*********************************************************************************
-     * @brief: 错误消息字符串
-     * @return: 
-     * @param:  const std::wstring & message
-     * @param:  const char * file 一般传__FILE__值进去
-     * @param:  uint32_t line
-     * Parameter: uint32_t line
-     *********************************************************************************/
-    Error(const std::wstring& message, const char* file, uint32_t line);
+    D3D12HeapPropertiesEx();
 
     /*********************************************************************************
      * @brief:
      * @return: 
-     * @param:  const std::wstring & message
-     * @param:  HRESULT error
-     * @param:  const char * file
-     * @param:  uint32_t line
+     * @param:  const XMLElement * elem
      *********************************************************************************/
-    Error(const std::wstring& message, HRESULT error, const char* file, uint32_t line);
+    D3D12HeapPropertiesEx(const XMLElement* elem);
+
+    /*********************************************************************************
+     * @brief:
+     * @return: 
+     * @param:  const CD3DX12_HEAP_PROPERTIES & o
+     *********************************************************************************/
+    explicit D3D12HeapPropertiesEx(const CD3DX12_HEAP_PROPERTIES& o);
+
+    /*********************************************************************************
+     * @brief:
+     * @return: 
+     * @param:  D3D12_CPU_PAGE_PROPERTY cpu_page_property
+     * @param:  D3D12_MEMORY_POOL memory_pool_preference
+     * @param:  UINT creation_node_mask
+     * @param:  UINT node_mask
+     *********************************************************************************/
+    D3D12HeapPropertiesEx(D3D12_CPU_PAGE_PROPERTY cpu_page_property, D3D12_MEMORY_POOL memory_pool_preference, UINT creation_node_mask, UINT node_mask);
+
+    /*********************************************************************************
+     * @brief:
+     * @return: 
+     * @param:  D3D12_HEAP_TYPE type
+     * @param:  UINT creationNodeMask
+     * @param:  UINT nodeMask
+     *********************************************************************************/
+    explicit D3D12HeapPropertiesEx(D3D12_HEAP_TYPE type,UINT creationNodeMask = 1,UINT nodeMask = 1);
 
     /*********************************************************************************
      * @brief:
      * @return: void
+     * @param:  const XMLElement * elem
      *********************************************************************************/
-    virtual void Notify() const;
-
-    /*********************************************************************************
-     * @brief: 通知用户出错了,提供一个二选一对话框给用户选择
-     * @return: void
-     *********************************************************************************/
-    virtual void Prompt() const;
-
-    /*********************************************************************************
-     * @brief:
-     * @return: void
-     * @param:  HRESULT hr
-     * @param:  const char * file
-     * @param:  int line
-     * @param:  const wchar_t * api_name
-     *********************************************************************************/
-    static void GRS_THROW_IF_FAILED(HRESULT hr, const char* file, int line, const wchar_t* api_name = nullptr);
-
-    static void ThrowTinyXMLException(XMLError error, const std::wstring& xml_file, const char* file, int line);
-
-    static void ThrowErrorOfLastError(const char* file, int line);
-
-    static const char* GetXMLAttribute(const XMLElement* elem,const char* attribute_name,const char* file_name,int code_line);
-protected:
-    /// <summary>
-    /// 组装错误消息,返回错误消息字符串
-    /// </summary>
-    /// <returns>错误消息字符串</returns>
-    virtual std::wstring AssembleOutput() const;
-
-    enum EXCEPTION_TYPE
-    {
-        EXCEPTION_MESSAGE,  ///< 返回错误消息,出错的代码文件和行
-        EXCEPTION_REGULAR,  ///< 返回错误消息,出错的代码文件和行
-        EXCEPTION_DX12_COM  ///< 返回错误消息,出错的代码文件和行以及渲染器给的错误代码
-    };
-
-    ///错误类型
-    EXCEPTION_TYPE type_;
-
-    /// 对话框窗口标题
-    std::wstring title_;
-
-    /// 错误消息字符串
-    std::wstring message_;
-
-    /// 发生错误的代码文件名
-    std::string file_;
-
-    /// 发生错误的代码行
-    uint32_t line_;
-
-    HRESULT hresult_;
+    void Init(const XMLElement* elem);
 };
 
-
-
-#endif // kgl_error_h__
+#endif // d3d12_heap_properties_ex_h__

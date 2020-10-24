@@ -15,6 +15,11 @@ ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI
 #include "error.h"
 #include "string_convertor.h"
 
+Error::Error(const std::wstring& message):
+    title_(L"Regular Exception"), type_(EXCEPTION_REGULAR), message_(message)
+{
+}
+
 Error::Error(const std::wstring& message, const char* file, uint32_t line) :
     title_(L"Regular Exception"), type_(EXCEPTION_REGULAR), message_(message),
     file_(file), line_(line)

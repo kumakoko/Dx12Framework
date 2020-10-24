@@ -15,6 +15,26 @@ ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI
 #include "xml_config_helper.h"
 #include "error.h"
 
+XMFLOAT4 XmlConfigHelper::AttributeVector4(const XMLElement* elem, const char* attribute_name, float default_value)
+{
+    if (!attribute_name || !elem)
+        return XMFLOAT4(default_value, default_value, default_value, default_value);
+
+    std::string vector4_str(elem->Attribute(attribute_name));
+    boost::algorithm::trim(vector4_str); // 字符串组合中的清除掉所有的空格
+    std::vector<std::string> vector4_str_array;
+    boost::split(vector4_str_array, vector4_str, boost::is_any_of(","), boost::token_compress_off);
+
+    switch (vector4_str.size())
+    {
+    case 0:return XMFLOAT4(default_value, default_value, default_value, default_value);
+    case 1:return XMFLOAT4(vector4_str[0], default_value, default_value, default_value);
+    case 2:return XMFLOAT4(vector4_str[0], vector4_str[1], default_value, default_value);
+    case 3:return XMFLOAT4(vector4_str[0], vector4_str[1], vector4_str[2], default_value);
+    case 4:default:return XMFLOAT4(vector4_str[0], vector4_str[1], vector4_str[2], vector4_str[3]);
+    }
+}
+
 D3D12_COMMAND_LIST_TYPE XmlConfigHelper::GetCommandListType(const char* command_list_type)
 {
     if (command_list_type)
@@ -82,6 +102,52 @@ DXGI_SWAP_EFFECT XmlConfigHelper::GetDXGISwapEffect(const char* swap_effect)
         else
             return DXGI_SWAP_EFFECT_DISCARD;
     }
+}
+
+D3D12_RESOURCE_STATES XmlConfigHelper::GetD3D12ResourceStates(const char* state_name)
+{
+    static bool s_not_init = true;
+    static std::map<std::string, D3D12_RESOURCE_STATES> s_res_state_dictionary;
+
+    if (s_not_init)
+    {
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_COMMON")] = D3D12_RESOURCE_STATE_COMMON;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER")] = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_INDEX_BUFFER")] = D3D12_RESOURCE_STATE_INDEX_BUFFER;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_RENDER_TARGET")] = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_UNORDERED_ACCESS")] = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_DEPTH_WRITE")] = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_DEPTH_READ")] = D3D12_RESOURCE_STATE_DEPTH_READ;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE")] = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE")] = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_STREAM_OUT")] = D3D12_RESOURCE_STATE_STREAM_OUT;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT")] = D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_COPY_DEST")] = D3D12_RESOURCE_STATE_COPY_DEST;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_COPY_SOURCE")] = D3D12_RESOURCE_STATE_COPY_SOURCE;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_RESOLVE_DEST")] = D3D12_RESOURCE_STATE_RESOLVE_DEST;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_RESOLVE_SOURCE")] = D3D12_RESOURCE_STATE_RESOLVE_SOURCE;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE ")] = D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_GENERIC_READ")] = D3D12_RESOURCE_STATE_GENERIC_READ;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_PRESENT")] = D3D12_RESOURCE_STATE_PRESENT;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_PREDICATION")] = D3D12_RESOURCE_STATE_PREDICATION;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_VIDEO_DECODE_WRITE")] = D3D12_RESOURCE_STATE_VIDEO_DECODE_WRITE;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_VIDEO_DECODE_READ")] = D3D12_RESOURCE_STATE_VIDEO_DECODE_READ;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_VIDEO_PROCESS_READ")] = D3D12_RESOURCE_STATE_VIDEO_PROCESS_READ;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_VIDEO_PROCESS_WRITE")] = D3D12_RESOURCE_STATE_VIDEO_PROCESS_WRITE;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_VIDEO_ENCODE_READ")] = D3D12_RESOURCE_STATE_VIDEO_ENCODE_READ;
+        s_res_state_dictionary[std::string("D3D12_RESOURCE_STATE_VIDEO_ENCODE_WRITE")] = D3D12_RESOURCE_STATE_VIDEO_ENCODE_WRITE;
+        s_not_init = false;
+    }
+
+    if (!state_name)
+        return D3D12_RESOURCE_STATE_COMMON;
+
+    auto iter = s_res_state_dictionary.find(std::string(state_name));
+
+    if (s_res_state_dictionary.end() == iter)
+        return D3D12_RESOURCE_STATE_COMMON;
+
+    return iter->second;
 }
 
 DXGI_FORMAT XmlConfigHelper::GetDXGIFormat(const char* format_name)
@@ -224,64 +290,6 @@ DXGI_FORMAT XmlConfigHelper::GetDXGIFormat(const char* format_name)
 
     return iter->second;
 }
-//
-//float XmlConfigHelper::AttributeValue(const char* attr, float default_value)
-//{
-//    if (!attr)
-//        return default_value;
-//
-//    return static_cast<float>(atof(attr));
-//}
-//
-//double XmlConfigHelper::AttributeValue(const char* attr, double default_value)
-//{
-//    if (!attr)
-//        return default_value;
-//
-//    return atof(attr);
-//}
-//
-//UINT XmlConfigHelper::AttributeValue(const char* attr, UINT default_value)
-//{
-//    if (!attr)
-//        return default_value;
-//
-//    return static_cast<UINT>(atoi(attr));
-//}
-//
-//UINT16 XmlConfigHelper::AttributeValue(const char* attr, UINT16 default_value)
-//{
-//    if (!attr)
-//        return default_value;
-//
-//    return static_cast<UINT16>(atoi(attr));
-//}
-//
-//INT XmlConfigHelper::AttributeValue(const char* attr, INT default_value)
-//{
-//    if (!attr)
-//        return default_value;
-//
-//    return static_cast<INT>(atoi(attr));
-//}
-
-BOOL XmlConfigHelper::AttributeValueBOOL(const char* attr, BOOL default_value)
-{
-    if (!attr)
-        return default_value;
-
-    return _stricmp("TRUE", attr) == 0 ? TRUE : FALSE;
-}
-
-/*
-bool XmlConfigHelper::AttributeValue(const char* attr, bool default_value)
-{
-    if (!attr)
-        return default_value;
-
-    return _stricmp("TRUE", attr) == 0;
-}
-*/
 
 D3D12_DESCRIPTOR_HEAP_TYPE XmlConfigHelper::GetDescriptorHeapType(const char* heap_type)
 {
@@ -374,12 +382,12 @@ void XmlConfigHelper::GetInputElementDesc(std::vector<D3D12_INPUT_ELEMENT_DESC>&
     while (elem)
     {
         desc.SemanticName = elem->Attribute("semantic_name");
-        desc.SemanticIndex = XmlConfigHelper::AttributeValue(elem->Attribute("semantic_index"), 0U);
+        desc.SemanticIndex = XmlConfigHelper::AttributeValue(elem,"semantic_index", 0U);
         desc.Format = XmlConfigHelper::GetDXGIFormat(elem->Attribute("format"));
-        desc.InputSlot = XmlConfigHelper::AttributeValue(elem->Attribute("input_slot"), 0U);
-        desc.AlignedByteOffset = XmlConfigHelper::AttributeValue(elem->Attribute("aligned_byte_offset"), 0U);
+        desc.InputSlot = XmlConfigHelper::AttributeValue(elem,"input_slot", 0U);
+        desc.AlignedByteOffset = XmlConfigHelper::AttributeValue(elem,"aligned_byte_offset", 0U);
         desc.InputSlotClass = XmlConfigHelper::GetInputClassification(elem->Attribute("input_slot_class"));
-        desc.InstanceDataStepRate = XmlConfigHelper::AttributeValue(elem->Attribute("instance_data_step_rate"), 0U);
+        desc.InstanceDataStepRate = XmlConfigHelper::AttributeValue(elem,"instance_data_step_rate", 0U);
         desc_array.emplace_back(desc);
         elem = elem->NextSiblingElement("D3D12_INPUT_ELEMENT_DESC");
     }
@@ -387,20 +395,15 @@ void XmlConfigHelper::GetInputElementDesc(std::vector<D3D12_INPUT_ELEMENT_DESC>&
 
 void XmlConfigHelper::InitGraphicsPipelineStateDesc(D3D12_GRAPHICS_PIPELINE_STATE_DESC* desc, XMLElement* elem)
 {
-    // D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-     //  psoDesc.InputLayout = { inputElementDescs.data(), inputElementDescs.size()/*_countof(inputElementDescs)*/ };
-     //  psoDesc.pRootSignature = pIRootSignature;
-      // psoDesc.VS = CD3DX12_SHADER_BYTECODE(vertexShader);
-     //  psoDesc.PS = CD3DX12_SHADER_BYTECODE(pixelShader);
     desc->RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     desc->BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    desc->DepthStencilState.DepthEnable = XmlConfigHelper::AttributeValueBOOL(elem->Attribute("depth_stencil_state_depth_enable"), FALSE);//FALSE;
-    desc->DepthStencilState.StencilEnable = XmlConfigHelper::AttributeValueBOOL(elem->Attribute("depth_stencil_state_stencil_enable"), FALSE);//FALSE;
-    desc->SampleMask = XmlConfigHelper::AttributeValue(elem->Attribute("sample_mask"), UINT_MAX);//UINT_MAX;
+    desc->DepthStencilState.DepthEnable = XmlConfigHelper::AttributeValue(elem,"depth_stencil_state_depth_enable", FALSE);//FALSE;
+    desc->DepthStencilState.StencilEnable = XmlConfigHelper::AttributeValue(elem,"depth_stencil_state_stencil_enable", FALSE);//FALSE;
+    desc->SampleMask = XmlConfigHelper::AttributeValue(elem,"sample_mask", UINT_MAX);//UINT_MAX;
     desc->PrimitiveTopologyType = XmlConfigHelper::GetPrimtiveTopologyType(elem->Attribute("primitive_topology_type"));//D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    desc->NumRenderTargets = XmlConfigHelper::AttributeValue(elem->Attribute("number_render_targets"), 1); //1;
+    desc->NumRenderTargets = XmlConfigHelper::AttributeValue(elem,"number_render_targets", 1); //1;
     desc->RTVFormats[0] = XmlConfigHelper::GetDXGIFormat(elem->Attribute("rtv_0_formats"));//DXGI_FORMAT_R8G8B8A8_UNORM;
-    desc->SampleDesc.Count = XmlConfigHelper::AttributeValue(elem->Attribute("sample_desc_count"), 1); //1;
+    desc->SampleDesc.Count = XmlConfigHelper::AttributeValue(elem,"sample_desc_count", 1); //1;
 }
 
 D3D12_PRIMITIVE_TOPOLOGY_TYPE XmlConfigHelper::GetPrimtiveTopologyType(const char* topology_type)
@@ -642,4 +645,158 @@ D3D12_TEXTURE_LAYOUT XmlConfigHelper::GetTextureLayoutType(const char* texture_l
         else
             return D3D12_TEXTURE_LAYOUT_UNKNOWN;
     }
+}
+
+D3D12_HEAP_TYPE XmlConfigHelper::GetHeapType(const char* heap_type)
+{
+    if (!heap_type)
+        return D3D12_HEAP_TYPE_DEFAULT;
+    else
+    {
+        if (_stricmp("D3D12_HEAP_TYPE_DEFAULT", heap_type) == 0)
+            return D3D12_HEAP_TYPE_DEFAULT;
+        else if (_stricmp("D3D12_HEAP_TYPE_UPLOAD", heap_type) == 0)
+            return D3D12_HEAP_TYPE_UPLOAD;
+        else if (_stricmp("D3D12_HEAP_TYPE_READBACK", heap_type) == 0)
+            return D3D12_HEAP_TYPE_READBACK;
+        else if (_stricmp("D3D12_HEAP_TYPE_CUSTOM", heap_type) == 0)
+            return D3D12_HEAP_TYPE_CUSTOM;
+        else
+            return D3D12_HEAP_TYPE_DEFAULT;
+    }
+}
+
+D3D12_CPU_PAGE_PROPERTY XmlConfigHelper::GetCpuPagePropertyType(const char* cpu_page_prop)
+{
+    if (!cpu_page_prop)
+        return D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    else
+    {
+        if (_stricmp("D3D12_CPU_PAGE_PROPERTY_UNKNOWN", cpu_page_prop) == 0)
+            return D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        else if (_stricmp("D3D12_CPU_PAGE_PROPERTY_NOT_AVAILABLE", cpu_page_prop) == 0)
+            return D3D12_CPU_PAGE_PROPERTY_NOT_AVAILABLE;
+        else if (_stricmp("D3D12_CPU_PAGE_PROPERTY_WRITE_COMBINE", cpu_page_prop) == 0)
+            return D3D12_CPU_PAGE_PROPERTY_WRITE_COMBINE;
+        else if (_stricmp("D3D12_CPU_PAGE_PROPERTY_WRITE_BACK", cpu_page_prop) == 0)
+            return D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+        else if (_stricmp("D3D12_CPU_PAGE_PROPERTY_UNKNOWN", cpu_page_prop) == 0)
+            return D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+        else
+            return D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+    }
+}
+
+D3D12_MEMORY_POOL XmlConfigHelper::GetMemoryPoolType(const char* mem_pool)
+{
+    if (!mem_pool)
+        return D3D12_MEMORY_POOL_UNKNOWN;
+    else
+    {
+        if (_stricmp("D3D12_MEMORY_POOL_L0", mem_pool) == 0)
+            return D3D12_MEMORY_POOL_L0;
+        else if (_stricmp("D3D12_MEMORY_POOL_L1", mem_pool) == 0)
+            return D3D12_MEMORY_POOL_L1;
+        else if (_stricmp("D3D12_MEMORY_POOL_UNKNOWN", mem_pool) == 0)
+            return D3D12_MEMORY_POOL_UNKNOWN;
+        else
+            return D3D12_MEMORY_POOL_UNKNOWN;
+    }
+}
+
+D3D12_DSV_FLAGS XmlConfigHelper::GetDSVFlagsType(const char* flag_type)
+{
+    if (!D3D12_DSV_FLAG_NONE)
+        return D3D12_DSV_FLAG_NONE;
+    else
+    {
+        if (_stricmp("D3D12_DSV_FLAG_NONE", flag_type) == 0)
+            return D3D12_DSV_FLAG_NONE;
+        else if (_stricmp("D3D12_DSV_FLAG_READ_ONLY_DEPTH", flag_type) == 0)
+            return D3D12_DSV_FLAG_READ_ONLY_DEPTH;
+        else if (_stricmp("D3D12_DSV_FLAG_READ_ONLY_STENCIL", flag_type) == 0)
+            return D3D12_DSV_FLAG_READ_ONLY_STENCIL;
+        else
+            return D3D12_DSV_FLAG_NONE;
+    }
+}
+
+D3D12_DSV_DIMENSION XmlConfigHelper::GetDSVDimensionType(const char* dsv_dim_type)
+{
+    if (!dsv_dim_type)
+        return D3D12_DSV_DIMENSION_UNKNOWN;
+    else
+    {
+        if (_stricmp("D3D12_DSV_DIMENSION_UNKNOWN", dsv_dim_type) == 0)
+            return D3D12_DSV_DIMENSION_UNKNOWN;
+        else if (_stricmp("D3D12_DSV_DIMENSION_TEXTURE1D", dsv_dim_type) == 0)
+            return D3D12_DSV_DIMENSION_TEXTURE1D;
+        else if (_stricmp("D3D12_DSV_DIMENSION_TEXTURE1DARRAY", dsv_dim_type) == 0)
+            return D3D12_DSV_DIMENSION_TEXTURE1DARRAY;
+        else if (_stricmp("D3D12_DSV_DIMENSION_TEXTURE2D", dsv_dim_type) == 0)
+            return D3D12_DSV_DIMENSION_TEXTURE2D;
+        else if (_stricmp("D3D12_DSV_DIMENSION_TEXTURE2DARRAY", dsv_dim_type) == 0)
+            return D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
+        else if (_stricmp("D3D12_DSV_DIMENSION_TEXTURE2DMS", dsv_dim_type) == 0)
+            return D3D12_DSV_DIMENSION_TEXTURE2DMS;
+        else if (_stricmp("D3D12_DSV_DIMENSION_TEXTURE2DMSARRAY", dsv_dim_type) == 0)
+            return D3D12_DSV_DIMENSION_TEXTURE2DMSARRAY;
+        else
+            return D3D12_DSV_DIMENSION_UNKNOWN;
+    }
+}
+
+D3D12_HEAP_FLAGS XmlConfigHelper::GetHeapFlagType(const char* heap_flag_type)
+{
+    if (!heap_flag_type)
+        return D3D12_HEAP_FLAG_NONE;
+    else
+    {
+        if (_stricmp("D3D12_HEAP_FLAG_NONE", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_NONE;
+        else if (_stricmp("D3D12_HEAP_FLAG_SHARED", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_SHARED;
+        else if (_stricmp("D3D12_HEAP_FLAG_DENY_BUFFERS", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_DENY_BUFFERS;
+        else if (_stricmp("D3D12_HEAP_FLAG_ALLOW_DISPLAY", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_ALLOW_DISPLAY;
+        else if (_stricmp("D3D12_HEAP_FLAG_SHARED_CROSS_ADAPTER", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_SHARED_CROSS_ADAPTER;
+        else if (_stricmp("D3D12_HEAP_FLAG_DENY_RT_DS_TEXTURES", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_DENY_RT_DS_TEXTURES;
+        else if (_stricmp("D3D12_HEAP_FLAG_DENY_NON_RT_DS_TEXTURES", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_DENY_NON_RT_DS_TEXTURES;
+        else if (_stricmp("D3D12_HEAP_FLAG_HARDWARE_PROTECTED", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_HARDWARE_PROTECTED;
+        else if (_stricmp("D3D12_HEAP_FLAG_ALLOW_WRITE_WATCH", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_ALLOW_WRITE_WATCH;
+        else if (_stricmp("D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS;
+        else if (_stricmp("D3D12_HEAP_FLAG_ALLOW_ALL_BUFFERS_AND_TEXTURES", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_ALLOW_ALL_BUFFERS_AND_TEXTURES;
+        else if (_stricmp("D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS;
+        else if (_stricmp("D3D12_HEAP_FLAG_ALLOW_ONLY_NON_RT_DS_TEXTURES", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_ALLOW_ONLY_NON_RT_DS_TEXTURES;
+        else if (_stricmp("D3D12_HEAP_FLAG_ALLOW_ONLY_RT_DS_TEXTURES", heap_flag_type) == 0)
+            return D3D12_HEAP_FLAG_ALLOW_ONLY_RT_DS_TEXTURES;
+        else
+            return D3D12_HEAP_FLAG_NONE;
+    }
+}
+
+
+const char* XmlConfigHelper::GetAttributeThrowError(const XMLElement* elem, const char* attribute_name)
+{
+    const char* attr = elem->Attribute(attribute_name);
+
+    if (nullptr == attr)
+    {
+        std::wstringstream wss(L"无法从名为");
+        wss << StringConvertor::UTF8toUTF16LE(elem->Name()) << L"的XML Element中\n";
+        wss << L"获取到名为" << StringConvertor::UTF8toUTF16LE(attribute_name) << L"的XML Attribute";
+        throw Error(wss.str().c_str());
+    }
+    
+    return attr;
 }

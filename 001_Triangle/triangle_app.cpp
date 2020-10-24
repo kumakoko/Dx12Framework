@@ -6,12 +6,19 @@
 void TriangleApp::CreateDX12Renderer()
 {
     dx12_renderer_ = new TriangleAppRenderer(m_hWnd, m_WindowWidth,m_WindowHeight);
-    dx12_renderer_->InitializeDXGIDevice(nullptr);
-    dx12_renderer_->InitializeCommand(nullptr);
-    dx12_renderer_->CreateSwapChain(nullptr);
-    dx12_renderer_->CreateFinalRenderTargets(nullptr);
+
+    tinyxml2::XMLDocument doc;
+    tinyxml2::XMLError ret = doc.LoadFile("default_renderer_setting.xml");
+    Error::ThrowTinyXMLException(ret, std::wstring(L"default_renderer_setting.xml"), __FILE__, __LINE__);
+    
+    const XMLElement* elem = doc.FirstChildElement("renderer");
+
+    dx12_renderer_->InitializeDXGIDevice(elem->FirstChildElement("dxgi_factory_adapter_device"));
+    dx12_renderer_->InitializeCommand(elem->FirstChildElement("commands"));
+    dx12_renderer_->CreateSwapChain(elem->FirstChildElement("swap_chain"));
+    dx12_renderer_->CreateFinalRenderTargets(elem->FirstChildElement("final_render_target"));
     dx12_renderer_->CreateSceneView(nullptr);
-    dx12_renderer_->CreateDepthStencilView(nullptr);
+    dx12_renderer_->CreateDepthStencilView(elem->FirstChildElement("default_depth_stencil_view"));
     dx12_renderer_->CreateFence(nullptr);
 }
 

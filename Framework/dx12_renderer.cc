@@ -1,6 +1,13 @@
 ﻿#include "pch.h"
 #include "dx12_renderer.h"
+#include "string_convertor.h"
 #include "xml_config_helper.h"
+#include "d3d12_resource_desc_ex.h"
+#include "d3d12_heap_properties_ex.h"
+#include "d3d12_clear_value_ex.h"
+#include "d3d12_depth_stencil_view_desc_ex.h"
+#include "d3d12_descriptor_heap_desc_ex.h"
+#include "d3d12_render_target_view_desc_ex.h"
 #include "error.h"
 
 /**
@@ -85,47 +92,44 @@ void Dx12Renderer::CreateDepthStencilView(const XMLElement* elem)
     HRESULT result = _swapchain->GetDesc1(&desc);
     Error::GRS_THROW_IF_FAILED(result, __FILE__, __LINE__, L"ID3D12Device::GetDesc1");
 
-    D3D12_RESOURCE_DESC resdesc = {};
-    resdesc.Width = desc.Width;
-    resdesc.Height = desc.Height;
-    resdesc.Dimension = XmlConfigHelper::GetResourceDimensionType(elem->Attribute("dimension")); //D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    resdesc.DepthOrArraySize = XmlConfigHelper::AttributeValue(elem->Attribute("depth_or_array_size"),1); //1;
-    resdesc.Format = XmlConfigHelper::GetDXGIFormat(elem->Attribute("format"));//DXGI_FORMAT_D32_FLOAT;
-    resdesc.SampleDesc.Count = XmlConfigHelper::AttributeValue(elem->Attribute("sample_desc_count"), 1); //1;
-    resdesc.SampleDesc.Quality = XmlConfigHelper::AttributeValue(elem->Attribute("sample_desc_quality"), 0); //0;
-    resdesc.Flags = XmlConfigHelper::GetResourceFlagsType(elem->Attribute("flags"));//D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-    resdesc.Layout = XmlConfigHelper::GetTextureLayoutType(elem->Attribute("layout"));//D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    resdesc.MipLevels = XmlConfigHelper::AttributeValue(elem->Attribute("mip_levels"), 1); //1;
-    resdesc.Alignment = XmlConfigHelper::AttributeValue(elem->Attribute("alignment"), 0); //0;
+    const XMLElement* depth_buffer_elem = elem->FirstChildElement("depth_buffer");
 
-    auto depthHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+    // 资源描述结构体
+    const XMLElement* res_desc_elem = depth_buffer_elem->FirstChildElement("D3D12_RESOURCE_DESC");
+    D3D12ResourceDescEx res_desc(res_desc_elem, desc.Width, desc.Height);
 
-    CD3DX12_CLEAR_VALUE depthClearValue(DXGI_FORMAT_D32_FLOAT, 1.0f, 0);
+    // 深度缓冲区的堆属性描述结构 
+    const XMLElement* heap_props_elem = depth_buffer_elem->FirstChildElement("D3D12_HEAP_PROPERTIES");
+    D3D12HeapPropertiesEx depth_heap_prop(heap_props_elem);
+
+    // 深度/模板缓冲区的清理填充用颜色值
+    const XMLElement* clear_value_elem = depth_buffer_elem->FirstChildElement("D3D12_CLEAR_VALUE");
+    D3D12ClearValueEx depth_clear_value(clear_value_elem);// (DXGI_FORMAT_D32_FLOAT, 1.0f, 0);
 
     result = _dev->CreateCommittedResource(
-        &depthHeapProp,
-        D3D12_HEAP_FLAG_NONE,
-        &resdesc,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE, //
-        &depthClearValue,
+        &depth_heap_prop,
+        XmlConfigHelper::GetHeapFlagType(elem->Attribute("heap_flags")),//D3D12_HEAP_FLAG_NONE,
+        &res_desc,
+        XmlConfigHelper::GetD3D12ResourceStates(elem->Attribute("resource_states")),//D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        &depth_clear_value,
         IID_PPV_ARGS(_depthBuffer.ReleaseAndGetAddressOf()));
+
     Error::GRS_THROW_IF_FAILED(result, __FILE__, __LINE__, L"ID3D12Device::CreateCommittedResource");
 
-    //
-    D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};//
-    dsvHeapDesc.NumDescriptors = 1;//
-    dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;//
-    dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-
-    result = _dev->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(_dsvHeap.ReleaseAndGetAddressOf()));
+    // 从XML文件中读取descriptor heap 描述结构
+    const XMLElement* descriptor_heap_desc_elem = depth_buffer_elem->FirstChildElement("D3D12_DESCRIPTOR_HEAP_DESC");
+    D3D12DescriptorHeapDescEx dsv_heap_desc(descriptor_heap_desc_elem);// () = {};//
+    result = _dev->CreateDescriptorHeap(&dsv_heap_desc, IID_PPV_ARGS(_dsvHeap.ReleaseAndGetAddressOf()));
     Error::GRS_THROW_IF_FAILED(result, __FILE__, __LINE__, L"ID3D12Device::CreateDescriptorHeap");
 
-    //
-    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-    dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;// 
-    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;// 
-    dsvDesc.Flags = D3D12_DSV_FLAG_NONE;//
-    _dev->CreateDepthStencilView(_depthBuffer.Get(), &dsvDesc, _dsvHeap->GetCPUDescriptorHandleForHeapStart());
+    // 从XML文件中读取D3D12_DEPTH_STENCIL_VIEW_DESC类型的结构体
+    const XMLElement* dsv_desc_elem = depth_buffer_elem->FirstChildElement("D3D12_DEPTH_STENCIL_VIEW_DESC");
+    D3D12DepthStencilViewDescEx dsv_desc;
+    dsv_desc.Init(dsv_desc_elem);
+
+    // 根据前面获得的D3D12_DEPTH_STENCIL_VIEW_DESC， D3D12_DESCRIPTOR_HEAP_DESC，D3D12_CLEAR_VALUE
+    // 和D3D12_CLEAR_VALUE四个结构体，创建出一个depth-stencil-value接口出来。
+    _dev->CreateDepthStencilView(_depthBuffer.Get(), &dsv_desc, _dsvHeap->GetCPUDescriptorHandleForHeapStart());
     Error::GRS_THROW_IF_FAILED(result, __FILE__, __LINE__, L"ID3D12Device::CreateDepthStencilView");
 }
 
@@ -148,7 +152,7 @@ void Dx12Renderer::InitializeDXGIDevice(const XMLElement* elem)
     /*如果你很奇怪接口和函数名后面的数字，那么你现在就理解他们为对应接口或函数的版本号，默认为0，也就是第一个原始
     版本，不用写出来，2就表示升级的第三个版本，依此类推。因为例子代码中要稍微用到一点扩展的功能，所以我们就用较
     高版本的函数和接口。*/
-    UINT flags = XmlConfigHelper::ParseWindowAssociationFlag(elem->Attribute("window_association"));
+    UINT flags = XmlConfigHelper::ParseWindowAssociationFlag(elem->Attribute("window_association")); 
     Error::GRS_THROW_IF_FAILED(_dxgiFactory->MakeWindowAssociation(window_handle_, flags), __FILE__, __LINE__);
 
     // 2 枚举所有支持Direct3D 12的显示适配器
@@ -198,8 +202,8 @@ void Dx12Renderer::CreateSwapChain(const XMLElement* elem)
     swapchainDesc.Height = _winSize.cy;
     swapchainDesc.Format = XmlConfigHelper::GetDXGIFormat(elem->Attribute("swapchain_format"));//DXGI_FORMAT_R8G8B8A8_UNORM;
     swapchainDesc.Stereo = false;
-    swapchainDesc.SampleDesc.Count = XmlConfigHelper::AttributeValue(elem->Attribute("sample_desc_count"), 1);//1;
-    swapchainDesc.SampleDesc.Quality = XmlConfigHelper::AttributeValue(elem->Attribute("sample_desc_quality"), 0);// 0;
+    swapchainDesc.SampleDesc.Count = XmlConfigHelper::AttributeValue(elem, "sample_desc_count", 1);//1;
+    swapchainDesc.SampleDesc.Quality = XmlConfigHelper::AttributeValue(elem, "sample_desc_quality", 0);// 0;
     swapchainDesc.BufferUsage = XmlConfigHelper::GetDXGIUsage(elem->Attribute("buffer_usage"));//DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapchainDesc.BufferCount = 2;
     swapchainDesc.Scaling = DXGI_SCALING_STRETCH;
@@ -230,12 +234,12 @@ void Dx12Renderer::InitializeCommand(const XMLElement* elem)
     /*再接下去如果你熟悉D3D11的话，我们就需要创建DeviceContext对象及接口了，而在D3D9中有了设备接口就相当
     于有了一切，直接就可以加载资源，设置管线状态，然后开始渲染（注意我跳过了说D3D10，你又猜对了，我是
     故意跳过的，想想为什么？）。
-    
+
     其实我一直觉得在D3D11中这个接口对象及名字DeviceContext不是那么直观。在D3D12中就直接改叫CommandQueue
     了。这是为什么呢？其实现代的显卡上或者说GPU中，已经包含多个可以同时并行执行命令的引擎了，不是游戏引擎，
     可以理解为执行某类指令的专用微核。也请注意这里的概念，一定要理解并行执行的引擎这个概念，因为将来的重要
     示例如多线程渲染，多显卡渲染示例等中还会用到这个概念。
-    
+
     这里再举个例子来加深理解这个概念，比如支持D3D12的GPU中至少就有执行3D命令的引擎，执行复制命令的引擎
     （就是从CPU内存中复制内容到显存中或反之或GPU内部以及引擎之间），执行通用计算命令的引擎（执行Computer
     Shader的引擎）以及可以进行视频编码解码的视频引擎等。而在D3D12中针对这些不同的引擎，就需要创建不同的命
@@ -244,7 +248,7 @@ void Dx12Renderer::InitializeCommand(const XMLElement* elem)
     const XMLElement* desc_element = elem->FirstChildElement("D3D12_COMMAND_QUEUE_DESC");
     D3D12_COMMAND_QUEUE_DESC cmd_queue_desc = {};
     cmd_queue_desc.Flags = XmlConfigHelper::GetCommandQueueFlag(desc_element->Attribute("flags")); //D3D12_COMMAND_QUEUE_FLAG_NONE;//
-    cmd_queue_desc.NodeMask = XmlConfigHelper::AttributeValue(desc_element->Attribute("node_mask"),0);
+    cmd_queue_desc.NodeMask = XmlConfigHelper::AttributeValue(desc_element, "node_mask", 0);
     cmd_queue_desc.Priority = XmlConfigHelper::GetCommandQueuePriority(desc_element->Attribute("priority"));//D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;//
     cmd_queue_desc.Type = cmd_list_type;// D3D12_COMMAND_LIST_TYPE_DIRECT;//
     result = _dev->CreateCommandQueue(&cmd_queue_desc, IID_PPV_ARGS(_cmdQueue.ReleaseAndGetAddressOf()));//
@@ -261,13 +265,9 @@ void Dx12Renderer::CreateFinalRenderTargets(const XMLElement* elem)
     HRESULT result = _swapchain->GetDesc1(&desc);
     Error::GRS_THROW_IF_FAILED(result, __FILE__, __LINE__, L"IDXGISwapChain4::GetDesc1");
 
+    // 从XML中读取描述符堆的描述体
     const XMLElement* heap_desc_elem = elem->FirstChildElement("D3D12_DESCRIPTOR_HEAP_DESC");
-    D3D12_DESCRIPTOR_HEAP_DESC heap_desc = {};
-    heap_desc.Type = XmlConfigHelper::GetDescriptorHeapType(heap_desc_elem->Attribute("type")); //D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    heap_desc.NodeMask = XmlConfigHelper::AttributeValue(heap_desc_elem->Attribute("node_mask"), 0);
-    heap_desc.NumDescriptors = XmlConfigHelper::AttributeValue(heap_desc_elem->Attribute("num_descriptors"), 0);
-    heap_desc.Flags = XmlConfigHelper::GetDescriptorHeapFlags(heap_desc_elem->Attribute("flags")); //D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-
+    D3D12DescriptorHeapDescEx heap_desc(heap_desc_elem);
     result = _dev->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(_rtvHeaps.ReleaseAndGetAddressOf()));
     Error::GRS_THROW_IF_FAILED(result, __FILE__, __LINE__, L"ID3D12Device::CreateDescriptorHeap");
 
@@ -280,9 +280,7 @@ void Dx12Renderer::CreateFinalRenderTargets(const XMLElement* elem)
     D3D12_CPU_DESCRIPTOR_HANDLE handle = _rtvHeaps->GetCPUDescriptorHandleForHeapStart();
 
     const XMLElement* rt_view_elem = elem->FirstChildElement("D3D12_RENDER_TARGET_VIEW_DESC");
-    D3D12_RENDER_TARGET_VIEW_DESC rtv_desc = {};
-    rtv_desc.Format = XmlConfigHelper::GetDXGIFormat(rt_view_elem->Attribute("format"));//DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    rtv_desc.ViewDimension = XmlConfigHelper::GetRenderTargetDimensionType(rt_view_elem->Attribute("view_dimension"));//D3D12_RTV_DIMENSION_TEXTURE2D;
+    D3D12RenderTargetViewDescEx rtv_desc(rt_view_elem);
 
     for (UINT i = 0U; i < swapchain_desc.BufferCount; ++i)
     {

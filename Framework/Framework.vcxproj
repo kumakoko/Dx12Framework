@@ -109,6 +109,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR);$(TINYXML2_HEADER_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4275;4251;4373;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -128,6 +129,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR);$(TINYXML2_HEADER_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4275;4251;4373;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,6 +151,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR);$(TINYXML2_HEADER_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4275;4251;4373;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -172,6 +175,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../3rdLib/iconv;$(D3DX12_HEADER_DIR);$(BOOST_HEADER_DIR);$(TINYXML2_HEADER_DIR)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4275;4251;4373;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -183,6 +187,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="d3d12_clear_value_ex.h" />
+    <ClInclude Include="d3d12_depth_stencil_view_desc_ex.h" />
+    <ClInclude Include="d3d12_descriptor_heap_desc_ex.h" />
+    <ClInclude Include="d3d12_heap_properties_ex.h" />
+    <ClInclude Include="d3d12_render_target_view_desc_ex.h" />
+    <ClInclude Include="d3d12_resource_desc_ex.h" />
     <ClInclude Include="dx12_application.h" />
     <ClInclude Include="dx12_renderer.h" />
     <ClInclude Include="error.h" />
@@ -192,6 +202,12 @@
     <ClInclude Include="xml_config_helper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="d3d12_clear_value_ex.cc" />
+    <ClCompile Include="d3d12_depth_stencil_view_desc_ex.cc" />
+    <ClCompile Include="d3d12_descriptor_heap_desc_ex.cc" />
+    <ClCompile Include="d3d12_heap_properties_ex.cc" />
+    <ClCompile Include="d3d12_render_target_view_desc_ex.cc" />
+    <ClCompile Include="d3d12_resource_desc_ex.cc" />
     <ClCompile Include="dx12_application.cc" />
     <ClCompile Include="dx12_renderer.cc" />
     <ClCompile Include="error.cc" />
